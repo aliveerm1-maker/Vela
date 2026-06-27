@@ -1,0 +1,1686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vela — Healthcare without barriers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0f;
+  --bg2: #111118;
+  --bgc: #16161f;
+  --brd: #1e1e2e;
+  --acc: #2dd4bf;
+  --acc-h: #14b8a4;
+  --acc-g: rgba(45,212,191,0.15);
+  --txt: #f0f0f5;
+  --txt2: #8888a0;
+  --txt3: #555568;
+  --ok: #22c55e;
+  --warn: #f59e0b;
+  --err: #ef4444;
+  --doc: #818cf8;
+  --pat: #2dd4bf;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Inter',sans-serif;font-size:16px;line-height:1.5}
+#app{min-height:100vh}
+a{color:var(--acc);text-decoration:none}
+input,select,textarea,button{font-family:inherit;font-size:inherit}
+img{display:block}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--brd);border-radius:3px}
+
+/* ── Buttons ── */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:10px;font-weight:700;cursor:pointer;border:none;transition:all .2s;white-space:nowrap}
+.btn-sm{padding:8px 16px;font-size:14px;border-radius:8px}
+.btn-primary{background:var(--acc);color:#0a0a0f}
+.btn-primary:hover{background:var(--acc-h);transform:translateY(-1px);box-shadow:0 4px 16px rgba(45,212,191,.3)}
+.btn-secondary{background:transparent;border:1px solid var(--brd);color:var(--txt)}
+.btn-secondary:hover{border-color:var(--acc);color:var(--acc)}
+.btn-danger{background:var(--err);color:#fff}
+.btn-danger:hover{background:#dc2626;transform:translateY(-1px)}
+.btn-ghost{background:transparent;color:var(--txt2);border:none;padding:8px 12px;font-size:13px;cursor:pointer}
+.btn-ghost:hover{color:var(--txt)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+/* ── Cards ── */
+.card{background:var(--bgc);border:1px solid var(--brd);border-radius:16px;padding:24px;box-shadow:0 4px 24px rgba(0,0,0,.4)}
+.card-sm{padding:16px;border-radius:12px}
+
+/* ── Inputs ── */
+.input{width:100%;background:#0d0d15;border:1px solid var(--brd);border-radius:10px;padding:14px 16px;color:var(--txt);outline:none;transition:border-color .2s,box-shadow .2s}
+.input:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(45,212,191,.1)}
+.input::placeholder{color:var(--txt3)}
+textarea.input{resize:vertical;min-height:160px;line-height:1.6}
+select.input{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238888a0' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+label.label{display:block;font-size:.75rem;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--txt2);margin-bottom:8px}
+
+/* ── Badges ── */
+.badge{display:inline-flex;align-items:center;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;line-height:1}
+.badge-ok{background:rgba(34,197,94,.15);color:var(--ok)}
+.badge-warn{background:rgba(245,158,11,.15);color:var(--warn)}
+.badge-err{background:rgba(239,68,68,.15);color:var(--err)}
+.badge-info{background:rgba(129,140,248,.15);color:var(--doc)}
+.badge-acc{background:var(--acc-g);color:var(--acc)}
+.badge-muted{background:rgba(136,136,160,.12);color:var(--txt2)}
+
+/* ── Divider ── */
+hr{border:none;border-top:1px solid var(--brd);margin:24px 0}
+
+/* ── Loading ── */
+.spinner{width:40px;height:40px;border:3px solid var(--brd);border-top-color:var(--acc);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:20px}
+.loading-screen p{color:var(--txt2);font-size:15px}
+
+/* ═══════════════════════════════════════
+   LANDING PAGE
+═══════════════════════════════════════ */
+.landing{display:flex;flex-direction:column;min-height:100vh}
+
+.hero{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:120px 24px 80px;overflow:hidden;min-height:90vh}
+.hero-glow{position:absolute;inset:0;background:radial-gradient(ellipse 60% 40% at 50% 50%,rgba(45,212,191,.12) 0%,transparent 70%);pointer-events:none}
+.hero-nav{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:24px 48px}
+.logo{display:flex;align-items:center;gap:10px;font-size:22px;font-weight:700;color:var(--acc);letter-spacing:-.02em}
+.hero h1{font-size:clamp(40px,7vw,72px);font-weight:700;letter-spacing:-.03em;line-height:1.05;max-width:800px;background:linear-gradient(135deg,#fff 40%,rgba(255,255,255,.7));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:24px}
+.hero p{font-size:20px;color:var(--txt2);max-width:560px;line-height:1.65;margin-bottom:48px}
+.hero-cta{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
+
+.features{padding:80px 48px;max-width:1100px;margin:0 auto;width:100%}
+.features h2{text-align:center;font-size:32px;font-weight:700;letter-spacing:-.02em;margin-bottom:48px}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.feature-card{background:var(--bgc);border:1px solid var(--brd);border-radius:16px;padding:32px;transition:border-color .2s,box-shadow .2s}
+.feature-card:hover{border-color:rgba(45,212,191,.3);box-shadow:0 8px 32px rgba(45,212,191,.08)}
+.feature-icon{width:56px;height:56px;border-radius:14px;background:var(--acc-g);display:flex;align-items:center;justify-content:center;margin-bottom:20px;color:var(--acc)}
+.feature-card h3{font-size:18px;font-weight:700;margin-bottom:10px;letter-spacing:-.01em}
+.feature-card p{font-size:15px;color:var(--txt2);line-height:1.6}
+
+.how-it-works{padding:80px 48px;background:var(--bg2);width:100%}
+.how-inner{max-width:800px;margin:0 auto}
+.how-it-works h2{text-align:center;font-size:32px;font-weight:700;letter-spacing:-.02em;margin-bottom:48px}
+.steps{display:flex;flex-direction:column;gap:32px}
+.step{display:flex;gap:24px;align-items:flex-start}
+.step-num{flex-shrink:0;width:48px;height:48px;border-radius:50%;background:var(--acc-g);border:1px solid rgba(45,212,191,.3);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:var(--acc)}
+.step-body h3{font-size:18px;font-weight:700;margin-bottom:6px}
+.step-body p{color:var(--txt2);line-height:1.6}
+
+.landing-footer{padding:40px 48px;text-align:center;border-top:1px solid var(--brd);color:var(--txt2);font-size:14px}
+.landing-footer span{color:var(--acc);font-weight:700}
+
+/* ═══════════════════════════════════════
+   ROLE SELECTION
+═══════════════════════════════════════ */
+.role-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:32px;padding:24px;text-align:center}
+.role-screen h2{font-size:28px;font-weight:700;letter-spacing:-.02em}
+.role-screen p{color:var(--txt2);max-width:400px}
+.role-cards{display:flex;gap:20px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+.role-card{background:var(--bgc);border:2px solid var(--brd);border-radius:20px;padding:40px 48px;cursor:pointer;transition:all .2s;min-width:220px}
+.role-card:hover{border-color:var(--acc);box-shadow:0 0 32px rgba(45,212,191,.15);transform:translateY(-2px)}
+.role-card .role-icon{font-size:48px;margin-bottom:16px}
+.role-card h3{font-size:20px;font-weight:700;margin-bottom:8px}
+.role-card p{font-size:14px;color:var(--txt2);line-height:1.5}
+
+/* ═══════════════════════════════════════
+   DASHBOARD LAYOUT
+═══════════════════════════════════════ */
+.dash{display:flex;min-height:100vh}
+
+.sidebar{width:260px;flex-shrink:0;background:#0d0d15;border-right:1px solid var(--brd);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;overflow-y:auto}
+.sb-logo{display:flex;align-items:center;gap:10px;padding:28px 20px 24px;font-size:24px;font-weight:700;color:var(--acc);letter-spacing:-.02em;border-bottom:1px solid var(--brd)}
+.sb-nav{flex:1;padding:16px 12px}
+.sb-nav-item{display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:10px;color:var(--txt2);cursor:pointer;font-size:14px;font-weight:500;transition:all .15s;margin-bottom:4px;border:none;background:none;width:100%;text-align:left}
+.sb-nav-item:hover{background:rgba(45,212,191,.06);color:var(--txt)}
+.sb-nav-item.active{background:rgba(45,212,191,.1);color:var(--acc)}
+.sb-nav-item svg{flex-shrink:0;opacity:.7}
+.sb-nav-item.active svg,.sb-nav-item:hover svg{opacity:1}
+.sb-footer{padding:16px 12px;border-top:1px solid var(--brd)}
+.sb-user{display:flex;align-items:center;gap:12px;padding:10px 16px;border-radius:10px}
+.sb-avatar{width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;background:var(--brd)}
+.sb-avatar-placeholder{width:36px;height:36px;border-radius:50%;background:var(--acc-g);display:flex;align-items:center;justify-content:center;color:var(--acc);font-weight:700;font-size:14px;flex-shrink:0}
+.sb-user-info{flex:1;min-width:0}
+.sb-user-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-user-role{font-size:11px;color:var(--txt2);margin-top:2px}
+
+.main-wrap{margin-left:260px;flex:1;padding:36px 40px;min-height:100vh}
+
+/* ═══════════════════════════════════════
+   DASHBOARD COMPONENTS
+═══════════════════════════════════════ */
+.page-title{font-size:24px;font-weight:700;letter-spacing:-.02em;margin-bottom:28px}
+.welcome{font-size:28px;font-weight:700;letter-spacing:-.02em;margin-bottom:6px}
+.welcome-sub{color:var(--txt2);font-size:15px;margin-bottom:32px}
+
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:32px}
+.stat-card{background:var(--bgc);border:1px solid var(--brd);border-radius:16px;padding:24px}
+.stat-label{font-size:.7rem;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--txt2);margin-bottom:10px}
+.stat-num{font-size:36px;font-weight:700;letter-spacing:-.03em;color:var(--txt)}
+.stat-accent{color:var(--acc)}
+
+.cta-card{background:var(--bgc);border:1px solid rgba(45,212,191,.25);border-radius:16px;padding:28px;box-shadow:0 0 32px rgba(45,212,191,.06);display:flex;align-items:center;justify-content:space-between;gap:24px;margin-bottom:32px}
+.cta-card h3{font-size:18px;font-weight:700;margin-bottom:6px}
+.cta-card p{color:var(--txt2);font-size:14px}
+
+.section-title{font-size:.75rem;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--txt2);margin-bottom:16px}
+
+/* Appointment rows */
+.appt-list{display:flex;flex-direction:column;gap:12px}
+.appt-row{background:var(--bgc);border:1px solid var(--brd);border-radius:12px;padding:16px 20px;display:flex;align-items:center;gap:16px}
+.appt-row:hover{border-color:rgba(255,255,255,.1)}
+.appt-date{font-size:13px;color:var(--txt2);white-space:nowrap;min-width:90px}
+.appt-name{flex:1;font-weight:500;font-size:14px}
+.appt-lang{font-size:13px;color:var(--txt2)}
+.appt-actions{display:flex;gap:8px}
+.empty-state{text-align:center;padding:60px 20px;color:var(--txt2)}
+.empty-state .empty-icon{font-size:48px;margin-bottom:16px;opacity:.5}
+.empty-state p{font-size:15px}
+
+/* Availability toggle */
+.avail-toggle{display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--bgc);border:1px solid var(--brd);border-radius:10px;cursor:pointer;font-weight:600;font-size:14px;border:none;transition:all .2s}
+.avail-toggle.on{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);color:var(--ok)}
+.avail-toggle.off{background:rgba(136,136,160,.08);border:1px solid var(--brd);color:var(--txt2)}
+.avail-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.avail-toggle.on .avail-dot{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+.avail-toggle.off .avail-dot{background:var(--txt3)}
+
+/* Queue cards */
+.queue-list{display:flex;flex-direction:column;gap:16px}
+.queue-card{background:var(--bgc);border:1px solid var(--brd);border-radius:16px;padding:20px;transition:border-color .2s}
+.queue-card:hover{border-color:rgba(45,212,191,.25)}
+.queue-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:12px}
+.queue-patient{font-weight:700;font-size:16px}
+.queue-meta{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--txt2);margin-bottom:12px}
+.queue-summary{background:#0d0d15;border:1px solid var(--brd);border-radius:8px;padding:12px;font-size:13px;color:var(--txt2);line-height:1.5;margin-bottom:16px}
+.queue-actions{display:flex;gap:10px}
+.queue-detail{display:none;margin-bottom:12px}
+.queue-detail.open{display:block}
+
+/* ═══════════════════════════════════════
+   NEW APPOINTMENT FLOW
+═══════════════════════════════════════ */
+.step-indicator{display:flex;align-items:center;margin-bottom:36px}
+.step-item{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.step-circle{width:32px;height:32px;border-radius:50%;border:2px solid var(--brd);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--txt2);transition:all .2s}
+.step-item.active .step-circle{border-color:var(--acc);color:var(--acc);background:var(--acc-g)}
+.step-item.done .step-circle{background:var(--acc);border-color:var(--acc);color:#0a0a0f}
+.step-label{font-size:13px;font-weight:500;color:var(--txt2)}
+.step-item.active .step-label{color:var(--txt)}
+.step-line{flex:1;height:1px;background:var(--brd);margin:0 12px;min-width:20px}
+.step-line.done{background:var(--acc)}
+
+.intake-box{max-width:720px}
+.intake-input-wrap{position:relative}
+.voice-btn{position:absolute;bottom:14px;right:14px;width:36px;height:36px;border-radius:8px;background:var(--acc-g);border:1px solid rgba(45,212,191,.3);color:var(--acc);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s}
+.voice-btn:hover{background:rgba(45,212,191,.25)}
+.voice-btn.recording{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.4);color:var(--err);animation:pulse-btn .8s ease-in-out infinite}
+@keyframes pulse-btn{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.3)}50%{box-shadow:0 0 0 6px rgba(239,68,68,0)}}
+
+.lang-select-wrap{margin-top:20px;max-width:300px}
+
+/* Intake review */
+.intake-review{background:#0d0d15;border:1px solid var(--brd);border-radius:12px;padding:20px;margin-bottom:24px}
+.intake-field{display:flex;gap:16px;padding:12px 0;border-bottom:1px solid var(--brd)}
+.intake-field:last-child{border-bottom:none}
+.intake-field-label{font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--txt2);width:120px;flex-shrink:0;padding-top:2px}
+.intake-field-value{font-size:14px;color:var(--txt)}
+.symptoms-list{display:flex;flex-wrap:wrap;gap:8px}
+.symptom-tag{background:var(--acc-g);color:var(--acc);padding:4px 10px;border-radius:6px;font-size:12px;font-weight:500}
+
+/* Waiting room */
+.waiting-room{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 24px;text-align:center;min-height:60vh}
+.pulse-wrap{position:relative;width:120px;height:120px;margin-bottom:32px}
+.pulse-ring{position:absolute;inset:-20px;border-radius:50%;border:2px solid rgba(45,212,191,.2);animation:ring-pulse 2s ease-out infinite}
+.pulse-ring:nth-child(2){animation-delay:.5s}
+.pulse-ring:nth-child(3){animation-delay:1s}
+.pulse-circle{width:120px;height:120px;border-radius:50%;background:var(--acc-g);border:2px solid rgba(45,212,191,.4);display:flex;align-items:center;justify-content:center;color:var(--acc)}
+@keyframes ring-pulse{0%{transform:scale(.8);opacity:.8}100%{transform:scale(1.6);opacity:0}}
+.waiting-room h2{font-size:22px;font-weight:700;margin-bottom:10px}
+.waiting-room p{color:var(--txt2);font-size:15px;margin-bottom:32px}
+
+/* ═══════════════════════════════════════
+   VIDEO ROOM
+═══════════════════════════════════════ */
+.video-room{display:flex;height:100vh;background:var(--bg);overflow:hidden}
+.video-col{flex:1;position:relative;min-width:0}
+.video-col iframe{width:100%;height:100%;border:none;display:block}
+.video-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:var(--bg2);color:var(--txt2)}
+.video-placeholder svg{opacity:.4}
+.video-topbar{position:absolute;top:0;left:0;right:0;background:linear-gradient(to bottom,rgba(0,0,0,.7) 0%,transparent 100%);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;z-index:10}
+.video-topbar .call-info{display:flex;align-items:center;gap:12px}
+.conn-dot{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 6px var(--ok)}
+.call-timer{font-size:14px;font-weight:600;color:var(--txt)}
+.video-bottombar{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(0,0,0,.8) 0%,transparent 100%);padding:24px;display:flex;align-items:center;justify-content:center;gap:16px;z-index:10}
+.ctrl-btn{width:48px;height:48px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;color:#fff}
+.ctrl-btn.ctrl-default{background:rgba(255,255,255,.15)}
+.ctrl-btn.ctrl-default:hover{background:rgba(255,255,255,.25)}
+.ctrl-btn.ctrl-end{background:var(--err);width:56px;height:56px}
+.ctrl-btn.ctrl-end:hover{background:#dc2626;transform:scale(1.05)}
+.ctrl-btn.ctrl-muted{background:rgba(239,68,68,.2);border:1px solid rgba(239,68,68,.4)}
+
+.translate-panel{width:320px;flex-shrink:0;background:var(--bg2);border-left:1px solid var(--brd);display:flex;flex-direction:column}
+.tp-header{padding:16px 20px;border-bottom:1px solid var(--brd);flex-shrink:0}
+.tp-header h3{font-size:14px;font-weight:700;margin-bottom:4px}
+.tp-header p{font-size:12px;color:var(--txt2)}
+.tp-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+.msg-bubble{padding:12px 14px;border-radius:12px;max-width:100%}
+.msg-bubble.msg-me{background:var(--acc-g);border:1px solid rgba(45,212,191,.2);align-self:flex-end}
+.msg-bubble.msg-other{background:var(--bgc);border:1px solid var(--brd)}
+.msg-original{font-size:11px;color:var(--txt2);margin-bottom:4px;line-height:1.4}
+.msg-translated{font-size:14px;color:var(--txt);line-height:1.5}
+.msg-ts{font-size:10px;color:var(--txt3);margin-top:4px}
+.tp-footer{padding:12px 16px;border-top:1px solid var(--brd);display:flex;gap:8px;flex-shrink:0}
+.tp-footer .input{padding:10px 14px;font-size:14px}
+.tp-send{width:40px;height:40px;border-radius:8px;background:var(--acc);border:none;color:#0a0a0f;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s}
+.tp-send:hover{background:var(--acc-h)}
+
+/* End call notes modal */
+.notes-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:100;padding:24px}
+.notes-modal{background:var(--bgc);border:1px solid var(--brd);border-radius:20px;padding:32px;width:100%;max-width:520px}
+.notes-modal h2{font-size:20px;font-weight:700;margin-bottom:8px}
+.notes-modal p{color:var(--txt2);font-size:14px;margin-bottom:20px}
+
+/* ═══════════════════════════════════════
+   SUMMARY PAGE
+═══════════════════════════════════════ */
+.summary-page{max-width:700px;margin:0 auto;padding:40px 24px}
+.summary-header{text-align:center;margin-bottom:40px}
+.summary-header h1{font-size:28px;font-weight:700;letter-spacing:-.02em;margin-bottom:8px}
+.summary-header p{color:var(--txt2);font-size:15px}
+.summary-section{margin-bottom:24px}
+.summary-section h3{font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--txt2);margin-bottom:12px}
+.summary-section p{font-size:15px;line-height:1.7;color:var(--txt)}
+.next-steps{display:flex;flex-direction:column;gap:10px}
+.next-step{display:flex;gap:14px;align-items:flex-start;padding:12px;background:#0d0d15;border-radius:8px;border:1px solid var(--brd)}
+.step-n{width:26px;height:26px;border-radius:50%;background:var(--acc-g);color:var(--acc);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.meds{display:flex;flex-wrap:wrap;gap:8px}
+.med-badge{background:rgba(129,140,248,.12);border:1px solid rgba(129,140,248,.25);color:var(--doc);padding:6px 14px;border-radius:20px;font-size:13px;font-weight:500}
+.followup-box{background:rgba(45,212,191,.06);border:1px solid rgba(45,212,191,.2);border-radius:10px;padding:16px;font-size:14px;color:var(--txt)}
+.summary-actions{display:flex;gap:12px;justify-content:center;margin-top:40px;flex-wrap:wrap}
+
+/* ═══════════════════════════════════════
+   MISC
+═══════════════════════════════════════ */
+.form-group{margin-bottom:20px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.tip-card{background:rgba(45,212,191,.06);border:1px solid rgba(45,212,191,.15);border-radius:12px;padding:20px}
+.tip-card p{font-size:14px;color:var(--txt2);line-height:1.6}
+.health-summary-card p{font-size:15px;color:var(--txt2);line-height:1.7}
+
+/* ═══════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════ */
+@media(max-width:900px){
+  .features-grid{grid-template-columns:1fr}
+  .stats-row{grid-template-columns:1fr 1fr}
+  .hero-nav{padding:16px 24px}
+  .features,.how-it-works{padding:60px 24px}
+}
+@media(max-width:768px){
+  .sidebar{width:100%;height:60px;bottom:auto;flex-direction:row;border-right:none;border-bottom:1px solid var(--brd);overflow:hidden}
+  .sb-logo{padding:0 16px;border-bottom:none;border-right:1px solid var(--brd);font-size:18px;height:60px}
+  .sb-nav{display:flex;flex-direction:row;padding:0 8px;align-items:center;overflow-x:auto;flex:1;gap:0}
+  .sb-nav-item{flex-direction:column;gap:2px;font-size:10px;padding:8px;min-width:56px;border-radius:8px;flex-shrink:0}
+  .sb-footer{display:none}
+  .main-wrap{margin-left:0;margin-top:60px;padding:20px 16px}
+  .video-room{flex-direction:column}
+  .translate-panel{width:100%;height:240px;border-left:none;border-top:1px solid var(--brd)}
+  .stats-row{grid-template-columns:1fr}
+  .cta-card{flex-direction:column}
+  .appt-row{flex-wrap:wrap}
+}
+@media(max-width:480px){
+  .hero h1{font-size:32px}
+  .hero p{font-size:16px}
+  .hero-cta{flex-direction:column;align-items:center}
+  .role-cards{flex-direction:column;align-items:center}
+  .role-card{width:100%;max-width:320px}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+// ═══════════════════════════════════════════════════════════════
+// CONSTANTS
+// ═══════════════════════════════════════════════════════════════
+
+const LANGUAGES = [
+  {code:'en',name:'English',flag:'🇺🇸'},
+  {code:'es',name:'Spanish',flag:'🇪🇸'},
+  {code:'fr',name:'French',flag:'🇫🇷'},
+  {code:'pt',name:'Portuguese',flag:'🇧🇷'},
+  {code:'ar',name:'Arabic',flag:'🇸🇦'},
+  {code:'hi',name:'Hindi',flag:'🇮🇳'},
+  {code:'bn',name:'Bengali',flag:'🇧🇩'},
+  {code:'zh',name:'Chinese (Mandarin)',flag:'🇨🇳'},
+  {code:'ru',name:'Russian',flag:'🇷🇺'},
+  {code:'ja',name:'Japanese',flag:'🇯🇵'},
+  {code:'ko',name:'Korean',flag:'🇰🇷'},
+  {code:'de',name:'German',flag:'🇩🇪'},
+  {code:'it',name:'Italian',flag:'🇮🇹'},
+  {code:'tr',name:'Turkish',flag:'🇹🇷'},
+  {code:'vi',name:'Vietnamese',flag:'🇻🇳'},
+  {code:'th',name:'Thai',flag:'🇹🇭'},
+  {code:'id',name:'Indonesian',flag:'🇮🇩'},
+  {code:'sw',name:'Swahili',flag:'🇰🇪'},
+  {code:'tl',name:'Tagalog',flag:'🇵🇭'},
+  {code:'ur',name:'Urdu',flag:'🇵🇰'},
+  {code:'fa',name:'Persian (Farsi)',flag:'🇮🇷'},
+  {code:'pl',name:'Polish',flag:'🇵🇱'},
+  {code:'uk',name:'Ukrainian',flag:'🇺🇦'},
+  {code:'am',name:'Amharic',flag:'🇪🇹'},
+  {code:'so',name:'Somali',flag:'🇸🇴'},
+  {code:'ha',name:'Hausa',flag:'🇳🇬'},
+  {code:'yo',name:'Yoruba',flag:'🇳🇬'}
+];
+const LANG_MAP = Object.fromEntries(LANGUAGES.map(l => [l.code, l]));
+
+const ICO = {
+  home:`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>`,
+  plus:`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>`,
+  cal:`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`,
+  heart:`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>`,
+  gear:`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>`,
+  list:`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r="1" fill="currentColor"/><circle cx="3" cy="12" r="1" fill="currentColor"/><circle cx="3" cy="18" r="1" fill="currentColor"/></svg>`,
+  book:`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>`,
+  mic:`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>`,
+  send:`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22,2 15,22 11,13 2,9"/></svg>`,
+  end:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M10.68 13.31a16 16 0 003.41 2.6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7 2 2 0 011.72 2v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.42 19.42 0 013.43 9.63 19.79 19.79 0 01.36 1a2 2 0 012-2.18h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.34 6.73a16 16 0 006.34 6.58z"/><line x1="23" y1="1" x2="1" y2="23"/></svg>`,
+  mute:`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="1" y1="1" x2="23" y2="23"/><path d="M9 9v3a3 3 0 005.12 2.12M15 9.34V4a3 3 0 00-5.94-.6"/><path d="M17 16.95A7 7 0 015 12v-2m14 0v2a7 7 0 01-.11 1.23"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>`,
+  cam_off:`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 16v1a2 2 0 01-2 2H3a2 2 0 01-2-2V7a2 2 0 012-2h2m5.66 0H14a2 2 0 012 2v3.34l1 1L23 7v10"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`,
+  dl:`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`,
+  check:`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20,6 9,17 4,12"/></svg>`,
+  flame:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 2C12 2 7 7 7 12C7 14.76 9.24 17 12 17C14.76 17 17 14.76 17 12C17 10 15 8 15 8C15 8 14 11 12 11C10 11 9 9 12 2Z" fill="#2dd4bf"/><path d="M10 17.5C10 18.88 10.9 20 12 20C13.1 20 14 18.88 14 17.5" stroke="#2dd4bf" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+  logout:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>`
+};
+
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
+
+let S = {
+  user: null,
+  view: 'loading',     // loading | landing | select_role | dashboard | video | end_call | summary
+  subview: 'home',     // dashboard sub-page
+  apptStep: 1,         // 1 | 2 | 3
+  currentAppt: null,
+  appointments: [],
+  queue: [],
+  intakeRaw: '',
+  intakeSummary: null,
+  selectedLang: 'en',
+  messages: [],
+  msgIndex: 0,
+  muted: false,
+  camOff: false,
+  callStart: null,
+  pollTimer: null,
+  msgTimer: null,
+  timerInterval: null,
+  toast: null,
+  loading: false
+};
+
+// ═══════════════════════════════════════════════════════════════
+// API
+// ═══════════════════════════════════════════════════════════════
+
+async function api(method, url, body) {
+  const opts = { method, headers: {'Content-Type':'application/json'}, credentials:'include' };
+  if (body) opts.body = JSON.stringify(body);
+  const r = await fetch(url, opts);
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(data.error || 'Request failed');
+  return data;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════════════
+
+function greet() {
+  const h = new Date().getHours();
+  return h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+}
+function firstName(n) { return n ? n.split(' ')[0] : 'there'; }
+function fmtDate(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'});
+}
+function timeAgo(iso) {
+  const ms = Date.now() - new Date(iso).getTime();
+  const m = Math.floor(ms/60000);
+  if (m < 1) return 'just now';
+  if (m < 60) return `${m} min ago`;
+  const h = Math.floor(m/60);
+  if (h < 24) return `${h}h ago`;
+  return fmtDate(iso);
+}
+function waitingTime(iso) {
+  const m = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
+  return m < 1 ? 'Just now' : `Waiting ${m} min`;
+}
+function langName(code) { return LANG_MAP[code]?.name || code; }
+function langFlag(code) { return LANG_MAP[code]?.flag || '🌐'; }
+function langDisplay(code) { return `${langFlag(code)} ${langName(code)}`; }
+
+function severityBadge(s) {
+  if (s === 'high') return `<span class="badge badge-err">High urgency</span>`;
+  if (s === 'medium') return `<span class="badge badge-warn">Medium</span>`;
+  return `<span class="badge badge-ok">Low</span>`;
+}
+function statusBadge(s) {
+  const map = {
+    pending: ['badge-warn','Pending'],
+    active: ['badge-ok','Active'],
+    completed: ['badge-info','Completed'],
+    cancelled: ['badge-muted','Cancelled']
+  };
+  const [cls, label] = map[s] || ['badge-muted', s];
+  return `<span class="badge ${cls}">${label}</span>`;
+}
+function maskName(n) {
+  if (!n) return 'Patient';
+  const parts = n.trim().split(' ');
+  return parts[0] + (parts[1] ? ' ' + parts[1][0] + '.' : '');
+}
+function langOptions(selected) {
+  return LANGUAGES.map(l => `<option value="${l.code}" ${l.code===selected?'selected':''}>${l.flag} ${l.name}</option>`).join('');
+}
+
+function showToast(msg, type='info') {
+  S.toast = {msg, type};
+  const t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.className = `toast toast-${type} show`;
+  setTimeout(() => { t.classList.remove('show'); S.toast = null; }, 3500);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// POLLING
+// ═══════════════════════════════════════════════════════════════
+
+function stopPolling() {
+  if (S.pollTimer) { clearInterval(S.pollTimer); S.pollTimer = null; }
+  if (S.msgTimer)  { clearInterval(S.msgTimer);  S.msgTimer = null; }
+  if (S.timerInterval) { clearInterval(S.timerInterval); S.timerInterval = null; }
+}
+
+function startWaitingPoll(apptId) {
+  stopPolling();
+  S.pollTimer = setInterval(async () => {
+    try {
+      const d = await api('GET', `/api/appointments/${apptId}/poll`);
+      if (d.status === 'active') {
+        stopPolling();
+        const apptData = await api('GET', `/api/appointments/${apptId}`);
+        S.currentAppt = apptData.appointment;
+        navigate('video');
+      } else if (d.status === 'cancelled') {
+        stopPolling();
+        showToast('Appointment cancelled', 'info');
+        navigate('dashboard', {subview:'home'});
+      }
+    } catch(e) {}
+  }, 5000);
+}
+
+function startMsgPoll(apptId) {
+  S.msgTimer = setInterval(async () => {
+    try {
+      const d = await api('GET', `/api/appointments/${apptId}/messages?since=${S.msgIndex}`);
+      if (d.messages && d.messages.length > 0) {
+        S.messages = [...S.messages, ...d.messages];
+        S.msgIndex = d.total;
+        updateMessageList();
+      }
+    } catch(e) {}
+  }, 3000);
+
+  // Also poll for call completion (patient side)
+  if (S.user?.role === 'patient') {
+    S.pollTimer = setInterval(async () => {
+      try {
+        const d = await api('GET', `/api/appointments/${apptId}/poll`);
+        if (d.status === 'completed') {
+          stopPolling();
+          const apptData = await api('GET', `/api/appointments/${apptId}`);
+          S.currentAppt = apptData.appointment;
+          navigate('summary');
+        }
+      } catch(e) {}
+    }, 5000);
+  }
+}
+
+function startCallTimer() {
+  S.callStart = Date.now();
+  S.timerInterval = setInterval(() => {
+    const el = document.getElementById('call-timer');
+    if (!el) { clearInterval(S.timerInterval); return; }
+    const s = Math.floor((Date.now() - S.callStart) / 1000);
+    const mm = String(Math.floor(s/60)).padStart(2,'0');
+    const ss = String(s%60).padStart(2,'0');
+    el.textContent = `${mm}:${ss}`;
+  }, 1000);
+}
+
+function updateMessageList() {
+  const el = document.getElementById('msg-list');
+  if (!el) return;
+  el.innerHTML = renderMessages();
+  el.scrollTop = el.scrollHeight;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════════════
+
+function navigate(view, opts = {}) {
+  stopPolling();
+  S = { ...S, view, ...opts };
+  render();
+}
+
+function subnav(sv) {
+  S.subview = sv;
+  if (sv === 'appointments' || sv === 'queue') loadSubviewData();
+  const el = document.getElementById('main-content');
+  if (el) {
+    el.innerHTML = renderSubview();
+    attachHandlers();
+  } else {
+    render();
+  }
+  // Update sidebar active state
+  document.querySelectorAll('.sb-nav-item').forEach(i => {
+    i.classList.toggle('active', i.dataset.sv === sv);
+  });
+}
+
+async function loadSubviewData() {
+  if (S.subview === 'appointments') {
+    const d = await api('GET', '/api/appointments').catch(() => ({appointments:[]}));
+    S.appointments = d.appointments || [];
+  }
+  if (S.subview === 'queue') {
+    const d = await api('GET', '/api/queue').catch(() => ({queue:[]}));
+    S.queue = d.queue || [];
+  }
+  const el = document.getElementById('main-content');
+  if (el) { el.innerHTML = renderSubview(); attachHandlers(); }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER FUNCTIONS
+// ═══════════════════════════════════════════════════════════════
+
+function render() {
+  const app = document.getElementById('app');
+  if (!app) return;
+  switch(S.view) {
+    case 'loading':    app.innerHTML = renderLoading(); break;
+    case 'landing':    app.innerHTML = renderLanding(); break;
+    case 'select_role':app.innerHTML = renderSelectRole(); break;
+    case 'dashboard':  app.innerHTML = renderDashboard(); loadInitialData(); break;
+    case 'video':      app.innerHTML = renderVideo(); startMsgPoll(S.currentAppt?.id); startCallTimer(); break;
+    case 'end_call':   app.innerHTML = renderEndCall(); break;
+    case 'summary':    app.innerHTML = renderSummary(); break;
+  }
+  ensureToast();
+  attachHandlers();
+}
+
+function ensureToast() {
+  if (!document.getElementById('toast')) {
+    const t = document.createElement('div');
+    t.id = 'toast';
+    t.className = 'toast';
+    document.body.appendChild(t);
+    const style = document.createElement('style');
+    style.textContent = `.toast{position:fixed;bottom:24px;right:24px;background:#1e1e2e;border:1px solid var(--brd);color:var(--txt);padding:12px 20px;border-radius:10px;font-size:14px;z-index:9999;opacity:0;transform:translateY(8px);transition:all .2s;pointer-events:none}.toast.show{opacity:1;transform:none}.toast-ok{border-color:rgba(34,197,94,.3)}.toast-err{border-color:rgba(239,68,68,.3)}`;
+    document.head.appendChild(style);
+  }
+}
+
+function renderLoading() {
+  return `<div class="loading-screen">${renderLogo()}<div class="spinner"></div><p>Loading Vela…</p></div>`;
+}
+
+function renderLogo(size=28) {
+  return `<div class="logo" style="font-size:${size}px">${ICO.flame} Vela</div>`;
+}
+
+function renderLanding() {
+  return `
+<div class="landing">
+  <section class="hero">
+    <div class="hero-glow"></div>
+    <nav class="hero-nav">
+      ${renderLogo(22)}
+      ${S.user ? `<button class="btn btn-secondary btn-sm" onclick="navigate('dashboard')">Dashboard</button>` : `<button class="btn btn-secondary btn-sm" onclick="handleLogin('')">Sign in</button>`}
+    </nav>
+    <h1>Healthcare without barriers</h1>
+    <p>Vela connects patients with volunteer doctors through AI-assisted video calls — in your language, on your schedule.</p>
+    <div class="hero-cta">
+      <button class="btn btn-primary" style="font-size:17px;padding:16px 36px" onclick="handleLogin('patient')">I need care</button>
+      <button class="btn btn-secondary" style="font-size:17px;padding:16px 36px" onclick="handleLogin('doctor')">I'm a doctor</button>
+    </div>
+  </section>
+
+  <section class="features">
+    <h2>Everything you need, nothing you don't</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        </div>
+        <h3>Smart AI Intake</h3>
+        <p>Describe your symptoms in your own words. Our AI understands plain language and creates a structured summary for your doctor — no medical jargon needed.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+        </div>
+        <h3>Live Translation</h3>
+        <p>Speak your language. A real-time translation chat sidebar ensures you and your doctor always understand each other, in 25+ languages.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <h3>Plain-Language Follow-up</h3>
+        <p>After your visit, receive a clear summary of what was discussed, your next steps, and any medications — written simply, in your language.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="how-it-works">
+    <div class="how-inner">
+      <h2>How it works</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <h3>Describe your symptoms</h3>
+            <p>Tell us what's going on in your own words — by typing or using voice input. Select your preferred language. No medical training required.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <h3>Connect with a volunteer doctor</h3>
+            <p>A volunteer doctor reviews your AI-generated intake summary and joins your video call. Real doctor, real care — completely free.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <h3>Get your visit summary</h3>
+            <p>After your call, receive a plain-language summary of everything discussed, next steps, and follow-up guidance — all in your language.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="landing-footer">
+    <span>Vela</span> — Healthcare without barriers &nbsp;·&nbsp; Free to use, built on volunteer care
+  </footer>
+</div>`;
+}
+
+function renderSelectRole() {
+  return `
+<div class="role-screen">
+  ${renderLogo()}
+  <div>
+    <h2>How are you using Vela?</h2>
+    <p style="color:var(--txt2);margin-top:8px">Choose your role to get started. You can't change this later.</p>
+  </div>
+  <div class="role-cards">
+    <div class="role-card" onclick="handleSetRole('patient')">
+      <div class="role-icon">🙋</div>
+      <h3>I need care</h3>
+      <p>Connect with a volunteer doctor for a free video consultation</p>
+    </div>
+    <div class="role-card" onclick="handleSetRole('doctor')">
+      <div class="role-icon">👨‍⚕️</div>
+      <h3>I'm a doctor</h3>
+      <p>Volunteer your time to help patients who need care</p>
+    </div>
+  </div>
+</div>`;
+}
+
+// ─── Sidebar ─────────────────────────────────────────────────────────────────
+
+function renderSidebar() {
+  const u = S.user;
+  const isDoc = u?.role === 'doctor';
+  const navItems = isDoc ? [
+    {sv:'home', icon:'home', label:'Home'},
+    {sv:'queue', icon:'list', label:'Patient Queue'},
+    {sv:'appointments', icon:'cal', label:'My Appointments'},
+    {sv:'resources', icon:'book', label:'Resources'},
+    {sv:'settings', icon:'gear', label:'Settings'}
+  ] : [
+    {sv:'home', icon:'home', label:'Home'},
+    {sv:'new_appt', icon:'plus', label:'New Appointment'},
+    {sv:'appointments', icon:'cal', label:'My Appointments'},
+    {sv:'health', icon:'heart', label:'My Health Summary'},
+    {sv:'settings', icon:'gear', label:'Settings'}
+  ];
+
+  const avatar = u?.picture
+    ? `<img class="sb-avatar" src="${u.picture}" alt="${u.name}" onerror="this.style.display='none'">`
+    : `<div class="sb-avatar-placeholder">${(u?.name||'?')[0].toUpperCase()}</div>`;
+
+  return `
+<aside class="sidebar">
+  <div class="sb-logo">${ICO.flame} Vela</div>
+  <nav class="sb-nav">
+    ${navItems.map(n => `
+      <button class="sb-nav-item ${S.subview===n.sv?'active':''}" data-sv="${n.sv}" onclick="subnav('${n.sv}')">
+        ${ICO[n.icon]} ${n.label}
+      </button>
+    `).join('')}
+  </nav>
+  <div class="sb-footer">
+    <div class="sb-user">
+      ${avatar}
+      <div class="sb-user-info">
+        <div class="sb-user-name">${u?.name || 'User'}</div>
+        <div class="sb-user-role">
+          <span class="badge ${isDoc ? 'badge-info' : 'badge-acc'}" style="font-size:10px;padding:2px 7px">${isDoc ? 'Doctor' : 'Patient'}</span>
+        </div>
+      </div>
+    </div>
+    <button class="btn-ghost" style="width:100%;margin-top:8px;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--txt2)" onclick="handleLogout()">
+      ${ICO.logout} Sign out
+    </button>
+  </div>
+</aside>`;
+}
+
+function renderDashboard() {
+  return `
+<div class="dash">
+  ${renderSidebar()}
+  <main class="main-wrap">
+    <div id="main-content">${renderSubview()}</div>
+  </main>
+</div>`;
+}
+
+function renderSubview() {
+  if (S.user?.role === 'patient') {
+    switch(S.subview) {
+      case 'home':        return renderPatientHome();
+      case 'new_appt':    return renderNewAppt();
+      case 'appointments':return renderPatientAppts();
+      case 'health':      return renderHealth();
+      case 'settings':    return renderSettings();
+      default:            return renderPatientHome();
+    }
+  } else {
+    switch(S.subview) {
+      case 'home':        return renderDoctorHome();
+      case 'queue':       return renderQueue();
+      case 'appointments':return renderDoctorAppts();
+      case 'resources':   return renderResources();
+      case 'settings':    return renderSettings();
+      default:            return renderDoctorHome();
+    }
+  }
+}
+
+// ─── Patient Home ─────────────────────────────────────────────
+
+function renderPatientHome() {
+  const appts = S.appointments;
+  const total = appts.length;
+  const upcoming = appts.filter(a => ['pending','active'].includes(a.status)).length;
+  const done = appts.filter(a => a.status === 'completed').length;
+  const recent = appts.slice(0, 5);
+
+  return `
+<div class="welcome">${greet()}, ${firstName(S.user?.name)} 👋</div>
+<div class="welcome-sub">Here's your health overview.</div>
+
+<div class="stats-row">
+  <div class="stat-card"><div class="stat-label">Total Appointments</div><div class="stat-num stat-accent">${total}</div></div>
+  <div class="stat-card"><div class="stat-label">Upcoming</div><div class="stat-num">${upcoming}</div></div>
+  <div class="stat-card"><div class="stat-label">Completed</div><div class="stat-num">${done}</div></div>
+</div>
+
+<div class="cta-card">
+  <div>
+    <h3>Ready to see a doctor?</h3>
+    <p>Describe your symptoms and connect with a volunteer doctor for free.</p>
+  </div>
+  <button class="btn btn-primary" onclick="subnav('new_appt')">Start new appointment</button>
+</div>
+
+<div class="section-title">Recent appointments</div>
+${recent.length === 0
+  ? `<div class="empty-state"><div class="empty-icon">📋</div><p>No appointments yet. Start one above!</p></div>`
+  : `<div class="appt-list">
+      ${recent.map(a => `
+      <div class="appt-row">
+        <div class="appt-date">${fmtDate(a.created_at)}</div>
+        <div class="appt-name">${a.doctor_name || '<span style="color:var(--txt2)">Awaiting doctor</span>'}</div>
+        <div class="appt-lang">${langFlag(a.language)} ${langName(a.language)}</div>
+        ${statusBadge(a.status)}
+        ${a.status === 'completed' ? `<button class="btn btn-secondary btn-sm" onclick="viewSummary('${a.id}')">View Summary</button>` : ''}
+        ${a.status === 'active' ? `<button class="btn btn-primary btn-sm" onclick="rejoinCall('${a.id}')">Rejoin Call</button>` : ''}
+        ${a.status === 'pending' ? `<button class="btn btn-ghost" onclick="cancelAppt('${a.id}')">Cancel</button>` : ''}
+      </div>`).join('')}
+    </div>`
+}`;
+}
+
+// ─── New Appointment ──────────────────────────────────────────
+
+function renderNewAppt() {
+  return `
+<div class="page-title">New Appointment</div>
+<div class="intake-box">
+  ${renderStepIndicator(S.apptStep)}
+  <div id="appt-step-content">
+    ${S.apptStep === 1 ? renderStep1() : S.apptStep === 2 ? renderStep2() : renderStep3()}
+  </div>
+</div>`;
+}
+
+function renderStepIndicator(step) {
+  const s = (n) => `step-item ${step===n?'active':''} ${step>n?'done':''}`;
+  const l = (n) => `step-line ${step>n?'done':''}`;
+  return `
+<div class="step-indicator">
+  <div class="${s(1)}"><div class="step-circle">${step>1?ICO.check:'1'}</div><span class="step-label">Describe</span></div>
+  <div class="${l(1)}"></div>
+  <div class="${s(2)}"><div class="step-circle">${step>2?ICO.check:'2'}</div><span class="step-label">Review</span></div>
+  <div class="${l(2)}"></div>
+  <div class="${s(3)}"><div class="step-circle">3</div><span class="step-label">Wait for Doctor</span></div>
+</div>`;
+}
+
+function renderStep1() {
+  return `
+<div class="card">
+  <div class="form-group">
+    <label class="label">What's going on?</label>
+    <div class="intake-input-wrap">
+      <textarea class="input" id="intake-textarea" placeholder="Tell us what's going on. How are you feeling? Don't worry about medical terms — just describe it in your own words." style="min-height:180px;padding-right:56px" oninput="S.intakeRaw=this.value">${S.intakeRaw}</textarea>
+      <button class="voice-btn" id="voice-btn" onclick="handleVoice()" title="Voice input">${ICO.mic}</button>
+    </div>
+  </div>
+  <div class="form-group lang-select-wrap">
+    <label class="label">Your preferred language</label>
+    <select class="input" onchange="S.selectedLang=this.value">
+      ${langOptions(S.selectedLang)}
+    </select>
+  </div>
+  <button class="btn btn-primary" style="margin-top:8px" onclick="handleIntakeContinue()" ${S.loading?'disabled':''}>
+    ${S.loading ? 'Analyzing…' : 'Continue →'}
+  </button>
+</div>`;
+}
+
+function renderStep2() {
+  const s = S.intakeSummary || {};
+  const symptoms = Array.isArray(s.symptoms) ? s.symptoms : [];
+  return `
+<div class="card">
+  <div class="section-title" style="margin-bottom:4px">Here's what we'll share with your doctor:</div>
+  <p style="color:var(--txt2);font-size:13px;margin-bottom:20px">Review the summary below. You can go back to edit if anything's wrong.</p>
+  <div class="intake-review">
+    <div class="intake-field">
+      <div class="intake-field-label">Chief Complaint</div>
+      <div class="intake-field-value">${s.chief_complaint || '—'}</div>
+    </div>
+    <div class="intake-field">
+      <div class="intake-field-label">Symptoms</div>
+      <div class="intake-field-value">
+        ${symptoms.length > 0
+          ? `<div class="symptoms-list">${symptoms.map(sym => `<span class="symptom-tag">${sym}</span>`).join('')}</div>`
+          : '—'}
+      </div>
+    </div>
+    <div class="intake-field">
+      <div class="intake-field-label">Duration</div>
+      <div class="intake-field-value">${s.duration || '—'}</div>
+    </div>
+    <div class="intake-field">
+      <div class="intake-field-label">Severity</div>
+      <div class="intake-field-value">${severityBadge(s.severity)}</div>
+    </div>
+  </div>
+  <div class="intake-field" style="border:none;padding:0;gap:10px;margin-bottom:20px">
+    <div class="intake-field-label">Language</div>
+    <div class="intake-field-value">${langDisplay(S.selectedLang)}</div>
+  </div>
+  <div style="display:flex;gap:12px">
+    <button class="btn btn-secondary" onclick="S.apptStep=1;renderStep1InPlace()">← Edit</button>
+    <button class="btn btn-primary" onclick="handleIntakeConfirm()" ${S.loading?'disabled':''}>
+      ${S.loading ? 'Finding a doctor…' : 'Confirm & Find a Doctor'}
+    </button>
+  </div>
+</div>`;
+}
+
+function renderStep3() {
+  return `
+<div class="waiting-room">
+  <div class="pulse-wrap">
+    <div class="pulse-ring"></div>
+    <div class="pulse-ring"></div>
+    <div class="pulse-ring"></div>
+    <div class="pulse-circle">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.06 8.81 19.79 19.79 0 01.06 1a2 2 0 012-2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.34 6.73a16 16 0 006.93 6.93l1.09-1.09a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 13.92v3z"/></svg>
+    </div>
+  </div>
+  <h2>Looking for an available doctor…</h2>
+  <p>A volunteer doctor will review your summary and join shortly.<br>This usually takes a few minutes.</p>
+  <div class="card card-sm" style="text-align:left;max-width:360px;margin-bottom:28px">
+    <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--txt2);margin-bottom:8px">Your summary</div>
+    <div style="font-size:13px;color:var(--txt)">${S.intakeSummary?.chief_complaint || '—'}</div>
+    ${S.intakeSummary?.symptoms?.length > 0 ? `<div class="symptoms-list" style="margin-top:8px">${S.intakeSummary.symptoms.map(s=>`<span class="symptom-tag">${s}</span>`).join('')}</div>` : ''}
+  </div>
+  <button class="btn btn-secondary btn-sm" onclick="cancelAppt(S.currentAppt?.id)">Cancel appointment</button>
+</div>`;
+}
+
+// ─── Patient Appointments ─────────────────────────────────────
+
+function renderPatientAppts() {
+  const appts = S.appointments;
+  if (appts.length === 0) return `
+<div class="page-title">My Appointments</div>
+<div class="empty-state"><div class="empty-icon">📋</div><p>No appointments yet.<br><button class="btn btn-primary btn-sm" style="margin-top:16px" onclick="subnav('new_appt')">Start your first appointment</button></p></div>`;
+
+  return `
+<div class="page-title">My Appointments</div>
+<div class="appt-list">
+  ${appts.map(a => `
+  <div class="appt-row">
+    <div class="appt-date">${fmtDate(a.created_at)}</div>
+    <div class="appt-name">${a.doctor_name || '<span style="color:var(--txt2)">Awaiting doctor</span>'}</div>
+    <div class="appt-lang">${langFlag(a.language)} ${langName(a.language)}</div>
+    ${statusBadge(a.status)}
+    <div class="appt-actions">
+      ${a.status === 'completed' ? `<button class="btn btn-secondary btn-sm" onclick="viewSummary('${a.id}')">View Summary</button>` : ''}
+      ${a.status === 'active' ? `<button class="btn btn-primary btn-sm" onclick="rejoinCall('${a.id}')">Rejoin Call</button>` : ''}
+      ${a.status === 'pending' ? `<button class="btn btn-ghost" onclick="cancelAppt('${a.id}')">Cancel</button>` : ''}
+    </div>
+  </div>`).join('')}
+</div>`;
+}
+
+// ─── Health Summary ───────────────────────────────────────────
+
+function renderHealth() {
+  const completed = S.appointments.filter(a => a.status === 'completed');
+  if (completed.length === 0) return `
+<div class="page-title">My Health Summary</div>
+<div class="empty-state"><div class="empty-icon">💊</div><p>Complete an appointment to see your health summary here.</p></div>`;
+
+  const allMeds = completed.flatMap(a => a.post_call_summary?.medications || []).filter(Boolean);
+  const uniqueMeds = [...new Set(allMeds)];
+
+  return `
+<div class="page-title">My Health Summary</div>
+<div style="display:flex;flex-direction:column;gap:20px">
+  <div class="card">
+    <div class="section-title">Overview</div>
+    <div class="stats-row" style="margin-bottom:0">
+      <div class="stat-card card-sm"><div class="stat-label">Consultations</div><div class="stat-num stat-accent">${completed.length}</div></div>
+      <div class="stat-card card-sm"><div class="stat-label">Medications Mentioned</div><div class="stat-num">${uniqueMeds.length}</div></div>
+      <div class="stat-card card-sm"><div class="stat-label">Languages Used</div><div class="stat-num">${[...new Set(completed.map(a=>a.language))].length}</div></div>
+    </div>
+  </div>
+  ${uniqueMeds.length > 0 ? `
+  <div class="card">
+    <div class="section-title">Medications mentioned in past visits</div>
+    <div class="meds">${uniqueMeds.map(m=>`<span class="med-badge">${m}</span>`).join('')}</div>
+  </div>` : ''}
+  <div class="card">
+    <div class="section-title">Past visits</div>
+    <div class="appt-list">
+      ${completed.map(a => `
+      <div class="appt-row">
+        <div class="appt-date">${fmtDate(a.created_at)}</div>
+        <div class="appt-name">${a.doctor_name || 'Doctor'}</div>
+        <div style="flex:1;font-size:13px;color:var(--txt2)">${a.post_call_summary?.what_we_discussed?.slice(0,80)||''}…</div>
+        <button class="btn btn-secondary btn-sm" onclick="viewSummary('${a.id}')">View</button>
+      </div>`).join('')}
+    </div>
+  </div>
+</div>`;
+}
+
+// ─── Doctor Home ──────────────────────────────────────────────
+
+function renderDoctorHome() {
+  const appts = S.appointments;
+  const helped = appts.filter(a => a.status === 'completed').length;
+  const week = appts.filter(a => {
+    if (a.status !== 'completed') return false;
+    const d = new Date(a.completed_at||a.created_at);
+    return (Date.now() - d.getTime()) < 7*24*60*60*1000;
+  }).length;
+  const hours = (helped * 0.5).toFixed(1);
+  const isAvail = S.user?.available;
+
+  return `
+<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:32px;gap:16px;flex-wrap:wrap">
+  <div>
+    <div class="welcome">${greet()}, Dr. ${firstName(S.user?.name)} 👋</div>
+    <div class="welcome-sub">Thank you for volunteering your time.</div>
+  </div>
+  <button class="avail-toggle ${isAvail?'on':'off'}" onclick="handleToggleAvail()">
+    <div class="avail-dot"></div>
+    ${isAvail ? 'Available' : 'Unavailable'}
+  </button>
+</div>
+
+<div class="stats-row" style="margin-bottom:32px">
+  <div class="stat-card"><div class="stat-label">Patients Helped</div><div class="stat-num stat-accent">${helped}</div></div>
+  <div class="stat-card"><div class="stat-label">This Week</div><div class="stat-num">${week}</div></div>
+  <div class="stat-card"><div class="stat-label">Hours Volunteered</div><div class="stat-num">${hours}</div></div>
+</div>
+
+<div class="tip-card" style="margin-bottom:24px">
+  <div style="font-weight:700;margin-bottom:6px;color:var(--acc)">💙 Thank you for volunteering</div>
+  <p class="tip-card p">Every appointment you complete gives someone access to care they couldn't otherwise get. Toggle "Available" above to start receiving patients from the queue.</p>
+</div>
+
+<div class="section-title">Quick actions</div>
+<div style="display:flex;gap:12px;flex-wrap:wrap">
+  <button class="btn btn-primary" onclick="subnav('queue')">View Patient Queue</button>
+  <button class="btn btn-secondary" onclick="subnav('appointments')">My Past Appointments</button>
+</div>`;
+}
+
+// ─── Doctor Queue ─────────────────────────────────────────────
+
+function renderQueue() {
+  const q = S.queue;
+  return `
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+  <div class="page-title" style="margin-bottom:0">Patient Queue</div>
+  <button class="btn btn-secondary btn-sm" onclick="refreshQueue()">Refresh</button>
+</div>
+${q.length === 0
+  ? `<div class="empty-state"><div class="empty-icon">🩺</div><p>No patients waiting right now.<br>Check back soon or refresh the queue.</p></div>`
+  : `<div class="queue-list">
+    ${q.map(a => {
+      const s = a.intake_summary || {};
+      const symptoms = Array.isArray(s.symptoms) ? s.symptoms.slice(0,3) : [];
+      return `
+      <div class="queue-card">
+        <div class="queue-header">
+          <div class="queue-patient">${maskName(a.patient_name)}</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            ${severityBadge(s.severity)}
+            <span class="badge badge-muted">${langFlag(a.language)} ${langName(a.language)}</span>
+          </div>
+        </div>
+        <div class="queue-meta">
+          <span>${ICO.clock} ${waitingTime(a.created_at)}</span>
+        </div>
+        <div class="queue-summary">
+          <strong>Chief complaint:</strong> ${s.chief_complaint || 'Not specified'}<br>
+          ${symptoms.length > 0 ? `<strong>Symptoms:</strong> ${symptoms.join(', ')}` : ''}
+        </div>
+        <div class="queue-detail" id="detail-${a.id}">
+          <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--txt2);margin-bottom:8px">Doctor notes</div>
+          <div style="font-size:13px;color:var(--txt2)">${s.urgency_notes || 'No additional notes'}</div>
+          <div style="margin-top:8px"><strong>Duration:</strong> ${s.duration || 'Unknown'}</div>
+        </div>
+        <div class="queue-actions">
+          <button class="btn btn-secondary btn-sm" onclick="toggleQueueDetail('${a.id}')">View Full Summary</button>
+          <button class="btn btn-primary btn-sm" onclick="acceptPatient('${a.id}')">Accept &amp; Join Call</button>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`
+}`;
+}
+
+function renderDoctorAppts() {
+  const appts = S.appointments;
+  if (appts.length === 0) return `
+<div class="page-title">My Appointments</div>
+<div class="empty-state"><div class="empty-icon">📋</div><p>You haven't seen any patients yet.<br>Toggle "Available" in the dashboard to start receiving patients.</p></div>`;
+
+  return `
+<div class="page-title">My Appointments</div>
+<div class="appt-list">
+  ${appts.map(a => `
+  <div class="appt-row">
+    <div class="appt-date">${fmtDate(a.created_at)}</div>
+    <div class="appt-name">${maskName(a.patient_name)}</div>
+    <div class="appt-lang">${langFlag(a.language)} ${langName(a.language)}</div>
+    ${statusBadge(a.status)}
+    <div class="appt-actions">
+      ${a.status === 'completed' ? `<button class="btn btn-secondary btn-sm" onclick="viewSummary('${a.id}')">View Notes</button>` : ''}
+      ${a.status === 'active' ? `<button class="btn btn-primary btn-sm" onclick="rejoinCall('${a.id}')">Rejoin Call</button>` : ''}
+    </div>
+  </div>`).join('')}
+</div>`;
+}
+
+function renderResources() {
+  return `
+<div class="page-title">Resources</div>
+<div style="display:flex;flex-direction:column;gap:16px;max-width:680px">
+  <div class="card"><h3 style="margin-bottom:10px">Telehealth best practices</h3><p style="color:var(--txt2);font-size:14px;line-height:1.7">Ensure good lighting, test your camera and microphone before each session, and find a quiet private space. Introduce yourself clearly and speak slowly for the translation system to be most effective.</p></div>
+  <div class="card"><h3 style="margin-bottom:10px">Working with the translation system</h3><p style="color:var(--txt2);font-size:14px;line-height:1.7">Use the text chat sidebar for key medical terms. Speak or type one concept at a time for most accurate translation. Confirm understanding by asking the patient to repeat back in their own words.</p></div>
+  <div class="card"><h3 style="margin-bottom:10px">When to refer</h3><p style="color:var(--txt2);font-size:14px;line-height:1.7">Vela is for non-emergency consultations only. If a patient describes symptoms suggesting a medical emergency (chest pain, difficulty breathing, stroke symptoms), advise them to call emergency services immediately.</p></div>
+</div>`;
+}
+
+function renderSettings() {
+  const u = S.user;
+  return `
+<div class="page-title">Settings</div>
+<div style="max-width:480px;display:flex;flex-direction:column;gap:20px">
+  <div class="card">
+    <div class="section-title">Account</div>
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px">
+      ${u?.picture ? `<img src="${u.picture}" style="width:56px;height:56px;border-radius:50%;object-fit:cover">` : `<div style="width:56px;height:56px;border-radius:50%;background:var(--acc-g);display:flex;align-items:center;justify-content:center;color:var(--acc);font-size:22px;font-weight:700">${(u?.name||'?')[0]}</div>`}
+      <div>
+        <div style="font-weight:700;font-size:16px">${u?.name||'—'}</div>
+        <div style="color:var(--txt2);font-size:14px">${u?.email||'—'}</div>
+        <div style="margin-top:4px"><span class="badge ${u?.role==='doctor'?'badge-info':'badge-acc'}">${u?.role==='doctor'?'Doctor':'Patient'}</span></div>
+      </div>
+    </div>
+    <button class="btn btn-danger btn-sm" onclick="handleLogout()">Sign out</button>
+  </div>
+  ${u?.role === 'patient' ? `
+  <div class="card">
+    <div class="section-title">Default Language</div>
+    <select class="input" onchange="saveDefaultLang(this.value)">
+      ${langOptions(u?.language||'en')}
+    </select>
+    <p style="font-size:12px;color:var(--txt2);margin-top:8px">This will be pre-selected when you start a new appointment.</p>
+  </div>` : ''}
+</div>`;
+}
+
+// ─── Video Room ───────────────────────────────────────────────
+
+function renderVideo() {
+  const a = S.currentAppt;
+  const isDoc = S.user?.role === 'doctor';
+  const token = isDoc ? a?.doctor_token : a?.patient_token;
+  const roomUrl = a?.room_url ? (token ? `${a.room_url}?t=${token}` : a.room_url) : null;
+  const patLang = LANG_MAP[a?.language]||LANG_MAP['en'];
+
+  return `
+<div class="video-room">
+  <div class="video-col">
+    ${roomUrl
+      ? `<iframe src="${roomUrl}" allow="camera; microphone; fullscreen; display-capture; autoplay" allowfullscreen></iframe>`
+      : `<div class="video-placeholder"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><polygon points="23,7 16,12 23,17 23,7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg><p>Video unavailable — use the translation chat to communicate</p></div>`}
+    <div class="video-topbar">
+      <div class="call-info">
+        <div class="conn-dot"></div>
+        <span style="font-size:13px;font-weight:600">${isDoc ? maskName(a?.patient_name) : (a?.doctor_name||'Doctor')}</span>
+        <span style="color:var(--txt2);font-size:13px">·</span>
+        <span id="call-timer" style="font-size:13px;font-weight:600;color:var(--acc)">00:00</span>
+      </div>
+      <div style="font-size:13px;color:var(--txt2)">${isDoc ? `${langFlag(a?.language)} → 🇺🇸` : `🇺🇸 → ${langFlag(a?.language)}`}</div>
+    </div>
+    <div class="video-bottombar">
+      <button class="ctrl-btn ctrl-default" id="mute-btn" onclick="toggleMute()" title="Mute">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+      </button>
+      <button class="ctrl-btn ctrl-default" id="cam-btn" onclick="toggleCam()" title="Camera">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="23,7 16,12 23,17 23,7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+      </button>
+      ${isDoc
+        ? `<button class="ctrl-btn ctrl-end" onclick="handleEndCall()" title="End call">${ICO.end}</button>`
+        : `<button class="ctrl-btn ctrl-end" onclick="handleLeaveCall()" title="Leave call">${ICO.end}</button>`}
+    </div>
+  </div>
+
+  <div class="translate-panel">
+    <div class="tp-header">
+      <h3>Live Translation</h3>
+      <p>${isDoc ? `English → ${patLang.flag} ${patLang.name}` : `${patLang.flag} ${patLang.name} → English`}</p>
+    </div>
+    <div class="tp-messages" id="msg-list">
+      ${renderMessages()}
+    </div>
+    <div class="tp-footer">
+      <input class="input" id="tp-input" type="text" placeholder="${isDoc ? 'Type in English…' : `Type in ${patLang.name}…`}" onkeydown="if(event.key==='Enter')sendMsg()">
+      <button class="tp-send" onclick="sendMsg()">${ICO.send}</button>
+    </div>
+  </div>
+</div>`;
+}
+
+function renderMessages() {
+  const isDoc = S.user?.role === 'doctor';
+  if (S.messages.length === 0) {
+    return `<div style="text-align:center;padding:32px 16px;color:var(--txt3);font-size:13px">Messages will appear here.<br>Type below to communicate.</div>`;
+  }
+  return S.messages.map(m => {
+    const isMine = m.sender === S.user?.role;
+    const showText = isMine ? m.original_text : m.translated_text;
+    const subText = isMine ? null : m.original_text;
+    const ts = new Date(m.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    return `
+    <div class="msg-bubble ${isMine?'msg-me':'msg-other'}">
+      ${subText ? `<div class="msg-original">${subText}</div>` : ''}
+      <div class="msg-translated">${showText}</div>
+      <div class="msg-ts">${ts}</div>
+    </div>`;
+  }).join('');
+}
+
+// ─── End Call Notes ───────────────────────────────────────────
+
+function renderEndCall() {
+  return `
+<div class="video-room" style="align-items:center;justify-content:center">
+  <div class="notes-overlay" style="position:relative;inset:auto;background:transparent;padding:24px">
+    <div class="notes-modal">
+      <h2>End Call &amp; Add Notes</h2>
+      <p>Add a brief note for the patient's visit summary. Our AI will convert your notes into a plain-language summary.</p>
+      <div class="form-group">
+        <label class="label">Doctor's notes (optional)</label>
+        <textarea class="input" id="doc-notes" placeholder="e.g. Patient reports 3 days of headache, no fever, likely tension headache. Advised rest, hydration, OTC pain relievers. Follow up if symptoms worsen." style="min-height:140px"></textarea>
+      </div>
+      <div style="display:flex;gap:12px">
+        <button class="btn btn-secondary" onclick="navigate('video')">← Back to call</button>
+        <button class="btn btn-primary" onclick="completeAppt()" id="complete-btn">Generate Summary &amp; End Call</button>
+      </div>
+    </div>
+  </div>
+</div>`;
+}
+
+// ─── Summary ──────────────────────────────────────────────────
+
+function renderSummary() {
+  const a = S.currentAppt;
+  const s = a?.post_call_summary || {};
+  const steps = Array.isArray(s.next_steps) ? s.next_steps : [];
+  const meds = Array.isArray(s.medications) ? s.medications : [];
+
+  return `
+<div style="min-height:100vh;background:var(--bg);padding:20px">
+<div class="summary-page">
+  <div class="summary-header">
+    <div style="display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;border-radius:50%;background:rgba(34,197,94,.1);margin-bottom:20px">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round"><polyline points="20,6 9,17 4,12"/></svg>
+    </div>
+    <h1>Your Visit Summary</h1>
+    <p>${fmtDate(a?.created_at)} · ${a?.doctor_name ? `Dr. ${a.doctor_name}` : 'Volunteer Doctor'} · ${langDisplay(a?.language||'en')}</p>
+  </div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="summary-section">
+      <h3>What we discussed</h3>
+      <p>${s.what_we_discussed || 'Visit completed.'}</p>
+    </div>
+  </div>
+
+  ${steps.length > 0 ? `
+  <div class="card" style="margin-bottom:16px">
+    <div class="summary-section">
+      <h3>What to do next</h3>
+      <div class="next-steps">
+        ${steps.map((step, i) => `
+        <div class="next-step">
+          <div class="step-n">${i+1}</div>
+          <div style="font-size:14px;color:var(--txt);line-height:1.5">${step}</div>
+        </div>`).join('')}
+      </div>
+    </div>
+  </div>` : ''}
+
+  ${meds.length > 0 ? `
+  <div class="card" style="margin-bottom:16px">
+    <div class="summary-section">
+      <h3>Medications mentioned</h3>
+      <div class="meds">${meds.map(m=>`<span class="med-badge">💊 ${m}</span>`).join('')}</div>
+    </div>
+  </div>` : ''}
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="summary-section">
+      <h3>Follow-up</h3>
+      <div class="followup-box">${s.follow_up || 'No specific follow-up recommended.'}</div>
+    </div>
+  </div>
+
+  <div class="summary-actions">
+    <button class="btn btn-secondary" onclick="downloadSummary()">
+      ${ICO.dl} Download Summary
+    </button>
+    <button class="btn btn-primary" onclick="navigate('dashboard',{subview:'new_appt',apptStep:1})">
+      Book another appointment
+    </button>
+  </div>
+</div>
+</div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// HANDLERS
+// ═══════════════════════════════════════════════════════════════
+
+async function init() {
+  try {
+    const d = await api('GET', '/api/me');
+    S.user = d.user;
+    if (!S.user) { navigate('landing'); return; }
+    if (!S.user.role) { navigate('select_role'); return; }
+    S.selectedLang = S.user.language || 'en';
+    await loadInitialData();
+    navigate('dashboard');
+  } catch(e) {
+    navigate('landing');
+  }
+}
+
+async function loadInitialData() {
+  if (!S.user) return;
+  try {
+    const d = await api('GET', '/api/appointments');
+    S.appointments = d.appointments || [];
+  } catch(e) {}
+}
+
+function handleLogin(intent) {
+  window.location.href = `/auth/google?intent=${intent}`;
+}
+
+async function handleSetRole(role) {
+  try {
+    await api('POST', '/auth/role', {role});
+    S.user.role = role;
+    S.selectedLang = S.user.language || 'en';
+    await loadInitialData();
+    navigate('dashboard');
+  } catch(e) {
+    showToast('Failed to set role', 'err');
+  }
+}
+
+async function handleLogout() {
+  await api('POST', '/auth/logout').catch(()=>{});
+  S.user = null;
+  navigate('landing');
+}
+
+async function handleIntakeContinue() {
+  const ta = document.getElementById('intake-textarea');
+  const text = ta ? ta.value.trim() : S.intakeRaw.trim();
+  if (!text) { showToast('Please describe your symptoms first', 'err'); return; }
+  S.intakeRaw = text;
+  S.loading = true;
+  const el = document.getElementById('appt-step-content');
+  if (el) el.innerHTML = `<div class="card" style="text-align:center;padding:48px"><div class="spinner" style="margin:0 auto 16px"></div><p style="color:var(--txt2)">Analyzing your symptoms…</p></div>`;
+  try {
+    const d = await api('POST', '/api/appointments', { intake_raw: S.intakeRaw, language: S.selectedLang });
+    S.currentAppt = d.appointment;
+    S.intakeSummary = d.appointment.intake_summary;
+    S.apptStep = 2;
+  } catch(e) {
+    showToast(e.message || 'Analysis failed', 'err');
+    S.apptStep = 1;
+  }
+  S.loading = false;
+  const el2 = document.getElementById('appt-step-content');
+  if (el2) { el2.innerHTML = S.apptStep === 2 ? renderStep2() : renderStep1(); attachHandlers(); }
+}
+
+async function handleIntakeConfirm() {
+  if (!S.currentAppt) return;
+  S.apptStep = 3;
+  const el = document.getElementById('appt-step-content');
+  if (el) el.innerHTML = renderStep3();
+  startWaitingPoll(S.currentAppt.id);
+}
+
+function renderStep1InPlace() {
+  S.apptStep = 1;
+  const el = document.getElementById('appt-step-content');
+  if (el) { el.innerHTML = renderStep1(); attachHandlers(); }
+}
+
+async function cancelAppt(id) {
+  if (!id) return;
+  if (!confirm('Cancel this appointment?')) return;
+  try {
+    await api('PATCH', `/api/appointments/${id}/cancel`);
+    stopPolling();
+    showToast('Appointment cancelled');
+    await loadInitialData();
+    subnav('appointments');
+  } catch(e) {
+    showToast(e.message || 'Could not cancel', 'err');
+  }
+}
+
+async function viewSummary(id) {
+  try {
+    const d = await api('GET', `/api/appointments/${id}`);
+    S.currentAppt = d.appointment;
+    navigate('summary');
+  } catch(e) {
+    showToast('Could not load summary', 'err');
+  }
+}
+
+async function rejoinCall(id) {
+  try {
+    const d = await api('GET', `/api/appointments/${id}`);
+    S.currentAppt = d.appointment;
+    S.messages = d.appointment.messages || [];
+    S.msgIndex = S.messages.length;
+    navigate('video');
+  } catch(e) {
+    showToast('Could not rejoin call', 'err');
+  }
+}
+
+async function handleToggleAvail() {
+  const newVal = !S.user.available;
+  try {
+    const d = await api('PATCH', '/api/me/availability', { available: newVal });
+    S.user.available = d.available;
+    showToast(d.available ? 'You are now available' : 'You are now unavailable');
+    const el = document.getElementById('main-content');
+    if (el) { el.innerHTML = renderSubview(); attachHandlers(); }
+  } catch(e) {
+    showToast('Failed to update status', 'err');
+  }
+}
+
+async function refreshQueue() {
+  const d = await api('GET', '/api/queue').catch(()=>({queue:[]}));
+  S.queue = d.queue || [];
+  const el = document.getElementById('main-content');
+  if (el) { el.innerHTML = renderSubview(); attachHandlers(); }
+}
+
+function toggleQueueDetail(id) {
+  const el = document.getElementById(`detail-${id}`);
+  if (el) el.classList.toggle('open');
+}
+
+async function acceptPatient(id) {
+  try {
+    showToast('Creating video room…', 'info');
+    const d = await api('POST', `/api/appointments/${id}/accept`);
+    S.currentAppt = d.appointment;
+    S.messages = [];
+    S.msgIndex = 0;
+    navigate('video');
+  } catch(e) {
+    showToast(e.message || 'Failed to accept patient', 'err');
+  }
+}
+
+function handleEndCall() {
+  stopPolling();
+  navigate('end_call');
+}
+
+function handleLeaveCall() {
+  if (!confirm('Leave the call? The doctor will still be able to complete the session.')) return;
+  stopPolling();
+  navigate('dashboard', {subview:'appointments'});
+}
+
+async function completeAppt() {
+  const notes = document.getElementById('doc-notes')?.value || '';
+  const btn = document.getElementById('complete-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Generating summary…'; }
+  try {
+    const d = await api('POST', `/api/appointments/${S.currentAppt.id}/complete`, { doctor_notes: notes });
+    S.currentAppt = d.appointment;
+    navigate('summary');
+  } catch(e) {
+    showToast(e.message || 'Failed to complete appointment', 'err');
+    if (btn) { btn.disabled = false; btn.textContent = 'Generate Summary & End Call'; }
+  }
+}
+
+async function sendMsg() {
+  const input = document.getElementById('tp-input');
+  const text = input?.value?.trim();
+  if (!text || !S.currentAppt) return;
+  input.value = '';
+  const isDoc = S.user?.role === 'doctor';
+  const src = isDoc ? 'en' : (S.currentAppt.language || 'en');
+  const tgt = isDoc ? (S.currentAppt.language || 'en') : 'en';
+  try {
+    await api('POST', '/api/translate', {
+      text,
+      source_language: src,
+      target_language: tgt,
+      appointment_id: S.currentAppt.id
+    });
+    const d = await api('GET', `/api/appointments/${S.currentAppt.id}/messages?since=${S.msgIndex}`);
+    if (d.messages?.length) {
+      S.messages = [...S.messages, ...d.messages];
+      S.msgIndex = d.total;
+      updateMessageList();
+    }
+  } catch(e) {
+    showToast('Translation failed', 'err');
+  }
+}
+
+let recognition = null;
+function handleVoice() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { showToast('Voice input not supported. Try Chrome.', 'err'); return; }
+  if (recognition) { recognition.stop(); recognition = null; return; }
+  recognition = new SR();
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  recognition.lang = S.selectedLang;
+  const btn = document.getElementById('voice-btn');
+  if (btn) btn.classList.add('recording');
+  recognition.onresult = e => {
+    const t = e.results[0][0].transcript;
+    const ta = document.getElementById('intake-textarea');
+    if (ta) { ta.value += (ta.value ? ' ' : '') + t; S.intakeRaw = ta.value; }
+  };
+  recognition.onend = () => {
+    recognition = null;
+    const b = document.getElementById('voice-btn');
+    if (b) b.classList.remove('recording');
+  };
+  recognition.onerror = () => {
+    recognition = null;
+    const b = document.getElementById('voice-btn');
+    if (b) b.classList.remove('recording');
+    showToast('Voice input error', 'err');
+  };
+  recognition.start();
+}
+
+function toggleMute() {
+  S.muted = !S.muted;
+  const btn = document.getElementById('mute-btn');
+  if (btn) btn.classList.toggle('ctrl-muted', S.muted);
+  showToast(S.muted ? 'Microphone muted' : 'Microphone on');
+}
+
+function toggleCam() {
+  S.camOff = !S.camOff;
+  const btn = document.getElementById('cam-btn');
+  if (btn) btn.classList.toggle('ctrl-muted', S.camOff);
+  showToast(S.camOff ? 'Camera off' : 'Camera on');
+}
+
+function downloadSummary() {
+  const a = S.currentAppt;
+  if (!a?.post_call_summary) return;
+  const s = a.post_call_summary;
+  const steps = (s.next_steps||[]).map((x,i)=>`${i+1}. ${x}`).join('\n');
+  const meds = (s.medications||[]).join(', ') || 'None mentioned';
+  const text = `VELA VISIT SUMMARY
+Date: ${fmtDate(a.created_at)}
+Doctor: ${a.doctor_name||'Volunteer Doctor'}
+Language: ${langName(a.language||'en')}
+
+WHAT WE DISCUSSED
+${s.what_we_discussed||''}
+
+WHAT TO DO NEXT
+${steps||'None specified'}
+
+MEDICATIONS MENTIONED
+${meds}
+
+FOLLOW-UP
+${s.follow_up||'None recommended'}
+
+---
+Generated by Vela — Healthcare without barriers
+`;
+  const blob = new Blob([text], {type:'text/plain'});
+  const url = URL.createObjectURL(blob);
+  const el = document.createElement('a');
+  el.href = url; el.download = `vela-summary-${(a.id||'').slice(0,8)}.txt`;
+  el.click();
+  URL.revokeObjectURL(url);
+}
+
+function saveDefaultLang(code) {
+  if (!S.user) return;
+  S.selectedLang = code;
+  S.user.language = code;
+  showToast('Language preference saved');
+}
+
+function attachHandlers() {
+  // Nothing extra needed — all handlers are inline
+  // This function exists for extension points
+}
+
+// ═══════════════════════════════════════════════════════════════
+// START
+// ═══════════════════════════════════════════════════════════════
+
+init();
+</script>
+</body>
+</html>
