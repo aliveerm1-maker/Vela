@@ -590,22 +590,21 @@ function navigate(view, opts = {}) {
 
 function subnav(sv) {
   S.subview = sv;
-  if (sv === 'appointments' || sv === 'queue') loadSubviewData();
-  const el = document.getElementById('main-content');
-  if (el) {
-    el.innerHTML = renderSubview();
-    attachHandlers();
+  if (sv === 'new_appt') { S.apptStep = 1; S.intakeRaw = ''; S.intakeSummary = null; }
+  if (['home', 'appointments', 'health', 'queue'].includes(sv)) {
+    loadSubviewData();
   } else {
-    render();
+    const el = document.getElementById('main-content');
+    if (el) { el.innerHTML = renderSubview(); attachHandlers(); }
+    else { render(); }
   }
-  // Update sidebar active state
   document.querySelectorAll('.sb-nav-item').forEach(i => {
     i.classList.toggle('active', i.dataset.sv === sv);
   });
 }
 
 async function loadSubviewData() {
-  if (S.subview === 'appointments') {
+  if (['appointments', 'home', 'health'].includes(S.subview)) {
     const d = await api('GET', '/api/appointments').catch(() => ({appointments:[]}));
     S.appointments = d.appointments || [];
   }
@@ -628,7 +627,13 @@ function render() {
     case 'loading':    app.innerHTML = renderLoading(); break;
     case 'landing':    app.innerHTML = renderLanding(); break;
     case 'select_role':app.innerHTML = renderSelectRole(); break;
-    case 'dashboard':  app.innerHTML = renderDashboard(); loadInitialData(); break;
+    case 'dashboard':
+      app.innerHTML = renderDashboard();
+      loadInitialData().then(() => {
+        const el = document.getElementById('main-content');
+        if (el && ['home','health'].includes(S.subview)) { el.innerHTML = renderSubview(); }
+      });
+      break;
     case 'video':      app.innerHTML = renderVideo(); startMsgPoll(S.currentAppt?.id); startCallTimer(); break;
     case 'end_call':   app.innerHTML = renderEndCall(); break;
     case 'summary':    app.innerHTML = renderSummary(); break;
@@ -1404,6 +1409,11 @@ async function loadInitialData() {
 }
 
 function handleLogin(intent) {
+  if (S.user) {
+    if (!S.user.role && intent) { handleSetRole(intent); return; }
+    navigate('dashboard');
+    return;
+  }
   window.location.href = `/auth/google?intent=${intent}`;
 }
 
