@@ -515,7 +515,9 @@ let S = {
   timerInterval: null,
   toast: null,
   loading: false,
-  theme: (typeof localStorage !== 'undefined' && localStorage.getItem('vela-theme')) || 'dark'
+  theme: (typeof localStorage !== 'undefined' && localStorage.getItem('vela-theme')) || 'dark',
+  queueWatcher: null,
+  seenQueueIds: null
 };
 
 // ═══════════════════════════════════════════════════════════════
@@ -618,6 +620,73 @@ function stopPolling() {
   if (S.timerInterval) { clearInterval(S.timerInterval); S.timerInterval = null; }
 }
 
+// ─── Doctor queue notifications ───────────────────────────────
+
+function requestNotificationPermission() {
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission().catch(() => {});
+  }
+}
+
+function beep() {
+  try {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    const ctx = new Ctx();
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.type = 'sine'; o.frequency.value = 880;
+    g.gain.setValueAtTime(0.0001, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.18, ctx.currentTime + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.35);
+    o.start(); o.stop(ctx.currentTime + 0.36);
+  } catch(e) {}
+}
+
+function notifyNewPatient(appt) {
+  beep();
+  const s = appt.intake_summary || {};
+  showToast(s.emergency ? '⚠ New patient — possible emergency' : 'New patient in the queue', 'ok');
+  if ('Notification' in window && Notification.permission === 'granted') {
+    try {
+      const n = new Notification('New patient waiting — Vela', {
+        body: `${s.chief_complaint || 'A patient needs care'}${s.emergency ? '\n⚠ Possible emergency' : ''}`,
+        tag: 'vela-queue-' + appt.id
+      });
+      n.onclick = () => { window.focus(); navigate('dashboard', { subview: 'queue' }); };
+    } catch(e) {}
+  }
+}
+
+async function startQueueWatcher() {
+  if (S.user?.role !== 'doctor') return;
+  stopQueueWatcher();
+  try {
+    const d = await api('GET', '/api/queue');
+    S.seenQueueIds = new Set((d.queue || []).map(a => a.id));
+  } catch(e) { S.seenQueueIds = new Set(); }
+  S.queueWatcher = setInterval(async () => {
+    if (!S.user?.available) return; // only alert while available
+    try {
+      const d = await api('GET', '/api/queue');
+      const q = d.queue || [];
+      const fresh = q.filter(a => !S.seenQueueIds.has(a.id));
+      q.forEach(a => S.seenQueueIds.add(a.id));
+      if (fresh.length) {
+        fresh.forEach(notifyNewPatient);
+        if (S.view === 'dashboard' && S.subview === 'queue') {
+          S.queue = q;
+          const el = document.getElementById('main-content');
+          if (el) { el.innerHTML = renderSubview(); attachHandlers(); }
+        }
+      }
+    } catch(e) {}
+  }, 15000);
+}
+
+function stopQueueWatcher() {
+  if (S.queueWatcher) { clearInterval(S.queueWatcher); S.queueWatcher = null; }
+}
+
 function startWaitingPoll(apptId) {
   stopPolling();
   S.pollTimer = setInterval(async () => {
@@ -690,6 +759,7 @@ function updateMessageList() {
 
 function navigate(view, opts = {}) {
   stopPolling();
+  if (view !== 'dashboard') stopQueueWatcher();
   S = { ...S, view, ...opts };
   render();
 }
@@ -739,6 +809,10 @@ function render() {
         const el = document.getElementById('main-content');
         if (el && ['home','health'].includes(S.subview)) { el.innerHTML = renderSubview(); }
       });
+      if (S.user?.role === 'doctor') {
+        if (S.user.available) requestNotificationPermission();
+        startQueueWatcher();
+      }
       break;
     case 'video':      app.innerHTML = renderVideo(); startMsgPoll(S.currentAppt?.id); startCallTimer(); break;
     case 'end_call':   app.innerHTML = renderEndCall(); break;
@@ -1255,8 +1329,10 @@ function renderDoctorHome() {
 </div>
 
 <div class="tip-card" style="margin-bottom:28px">
-  <div style="font-size:13px;font-weight:700;color:var(--acc);margin-bottom:6px;letter-spacing:.01em">Thank you for volunteering</div>
-  <p>Every appointment you complete gives someone access to care they couldn't otherwise get. Toggle your availability above to start receiving patients from the queue.</p>
+  <div style="display:flex;align-items:center;gap:7px;font-size:13px;font-weight:700;color:var(--acc);margin-bottom:6px;letter-spacing:.01em">${ICO.bell} ${isAvail ? "You'll be alerted when a patient joins" : 'Thank you for volunteering'}</div>
+  <p>${isAvail
+    ? "While you're available, Vela plays a sound and shows a desktop notification the moment a new patient enters the queue — so you don't have to watch this page."
+    : "Every appointment you complete gives someone access to care they couldn't otherwise get. Toggle your availability above to start receiving patients and get notified when they join."}</p>
 </div>
 
 <div class="section-title">Quick actions</div>
@@ -1787,7 +1863,13 @@ async function handleToggleAvail() {
   try {
     const d = await api('PATCH', '/api/me/availability', { available: newVal });
     S.user.available = d.available;
-    showToast(d.available ? 'You are now available' : 'You are now unavailable');
+    if (d.available) {
+      requestNotificationPermission();
+      startQueueWatcher(); // reseed baseline so existing patients don't all alert
+      showToast("You're available — we'll alert you when a patient joins", 'ok');
+    } else {
+      showToast('You are now unavailable');
+    }
     const el = document.getElementById('main-content');
     if (el) { el.innerHTML = renderSubview(); attachHandlers(); }
   } catch(e) {
