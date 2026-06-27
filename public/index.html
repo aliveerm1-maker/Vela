@@ -5,340 +5,346 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vela — Healthcare without barriers</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #0a0a0f;
-  --bg2: #111118;
-  --bgc: #16161f;
-  --brd: #1e1e2e;
-  --acc: #2dd4bf;
-  --acc-h: #14b8a4;
-  --acc-g: rgba(45,212,191,0.15);
-  --txt: #f0f0f5;
-  --txt2: #8888a0;
-  --txt3: #555568;
-  --ok: #22c55e;
+  --bg:   #07070e;
+  --bg2:  #0b0b16;
+  --bgc:  #0f0f1e;
+  --bgc2: #141428;
+  --brd:  #1c1c32;
+  --brd2: #252545;
+  --acc:  #2dd4bf;
+  --acc-h:#14b8a4;
+  --acc-g:rgba(45,212,191,.1);
+  --acc-g2:rgba(45,212,191,.05);
+  --txt:  #eaeaf5;
+  --txt2: #6b6b90;
+  --txt3: #3a3a55;
+  --ok:   #22c55e;
   --warn: #f59e0b;
-  --err: #ef4444;
-  --doc: #818cf8;
-  --pat: #2dd4bf;
+  --err:  #ef4444;
+  --doc:  #818cf8;
+  --sh:   0 1px 3px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.25);
+  --sh-lg:0 4px 12px rgba(0,0,0,.5),0 20px 60px rgba(0,0,0,.35);
+  --sh-acc:0 0 40px rgba(45,212,191,.12);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Inter',sans-serif;font-size:16px;line-height:1.5}
+html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Inter',sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
 #app{min-height:100vh}
 a{color:var(--acc);text-decoration:none}
 input,select,textarea,button{font-family:inherit;font-size:inherit}
 img{display:block}
 
-/* ── Scrollbar ── */
-::-webkit-scrollbar{width:6px}
-::-webkit-scrollbar-track{background:var(--bg2)}
-::-webkit-scrollbar-thumb{background:var(--brd);border-radius:3px}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--brd2);border-radius:99px}
 
 /* ── Buttons ── */
-.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:10px;font-weight:700;cursor:pointer;border:none;transition:all .2s;white-space:nowrap}
-.btn-sm{padding:8px 16px;font-size:14px;border-radius:8px}
-.btn-primary{background:var(--acc);color:#0a0a0f}
-.btn-primary:hover{background:var(--acc-h);transform:translateY(-1px);box-shadow:0 4px 16px rgba(45,212,191,.3)}
-.btn-secondary{background:transparent;border:1px solid var(--brd);color:var(--txt)}
-.btn-secondary:hover{border-color:var(--acc);color:var(--acc)}
-.btn-danger{background:var(--err);color:#fff}
-.btn-danger:hover{background:#dc2626;transform:translateY(-1px)}
-.btn-ghost{background:transparent;color:var(--txt2);border:none;padding:8px 12px;font-size:13px;cursor:pointer}
-.btn-ghost:hover{color:var(--txt)}
-.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;border-radius:10px;font-weight:600;font-size:14px;letter-spacing:.01em;cursor:pointer;border:none;transition:all .18s cubic-bezier(.4,0,.2,1);white-space:nowrap;position:relative;overflow:hidden}
+.btn-sm{padding:7px 15px;font-size:13px;border-radius:8px}
+.btn-primary{background:var(--acc);color:#04100f;box-shadow:0 0 0 0 rgba(45,212,191,0)}
+.btn-primary:hover{background:var(--acc-h);transform:translateY(-1px);box-shadow:0 6px 20px rgba(45,212,191,.35)}
+.btn-primary:active{transform:translateY(0)}
+.btn-secondary{background:rgba(255,255,255,.04);border:1px solid var(--brd2);color:var(--txt);backdrop-filter:blur(8px)}
+.btn-secondary:hover{border-color:rgba(45,212,191,.4);color:var(--acc);background:rgba(45,212,191,.05)}
+.btn-danger{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:var(--err)}
+.btn-danger:hover{background:var(--err);color:#fff;border-color:var(--err);box-shadow:0 6px 20px rgba(239,68,68,.3)}
+.btn-ghost{background:transparent;color:var(--txt2);border:none;padding:8px 12px;font-size:13px;cursor:pointer;border-radius:8px;transition:all .15s}
+.btn-ghost:hover{color:var(--txt);background:rgba(255,255,255,.05)}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none !important;box-shadow:none !important}
 
 /* ── Cards ── */
-.card{background:var(--bgc);border:1px solid var(--brd);border-radius:16px;padding:24px;box-shadow:0 4px 24px rgba(0,0,0,.4)}
+.card{background:var(--bgc);border:1px solid var(--brd);border-radius:16px;padding:24px;box-shadow:var(--sh)}
 .card-sm{padding:16px;border-radius:12px}
 
 /* ── Inputs ── */
-.input{width:100%;background:#0d0d15;border:1px solid var(--brd);border-radius:10px;padding:14px 16px;color:var(--txt);outline:none;transition:border-color .2s,box-shadow .2s}
-.input:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(45,212,191,.1)}
+.input{width:100%;background:rgba(0,0,0,.3);border:1px solid var(--brd);border-radius:10px;padding:13px 16px;color:var(--txt);outline:none;transition:all .18s;font-size:14px}
+.input:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(45,212,191,.08);background:rgba(0,0,0,.4)}
 .input::placeholder{color:var(--txt3)}
-textarea.input{resize:vertical;min-height:160px;line-height:1.6}
-select.input{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238888a0' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
-label.label{display:block;font-size:.75rem;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--txt2);margin-bottom:8px}
+textarea.input{resize:vertical;min-height:160px;line-height:1.65}
+select.input{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6b90' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:40px}
+select.input option{background:#0f0f1e;color:var(--txt)}
+label.label{display:block;font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--txt2);margin-bottom:8px}
 
 /* ── Badges ── */
-.badge{display:inline-flex;align-items:center;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;line-height:1}
-.badge-ok{background:rgba(34,197,94,.15);color:var(--ok)}
-.badge-warn{background:rgba(245,158,11,.15);color:var(--warn)}
-.badge-err{background:rgba(239,68,68,.15);color:var(--err)}
-.badge-info{background:rgba(129,140,248,.15);color:var(--doc)}
-.badge-acc{background:var(--acc-g);color:var(--acc)}
-.badge-muted{background:rgba(136,136,160,.12);color:var(--txt2)}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.02em;line-height:1.4}
+.badge-ok{background:rgba(34,197,94,.12);color:#4ade80;border:1px solid rgba(34,197,94,.2)}
+.badge-warn{background:rgba(245,158,11,.12);color:#fbbf24;border:1px solid rgba(245,158,11,.2)}
+.badge-err{background:rgba(239,68,68,.12);color:#f87171;border:1px solid rgba(239,68,68,.2)}
+.badge-info{background:rgba(129,140,248,.12);color:#a5b4fc;border:1px solid rgba(129,140,248,.2)}
+.badge-acc{background:var(--acc-g);color:var(--acc);border:1px solid rgba(45,212,191,.2)}
+.badge-muted{background:rgba(107,107,144,.1);color:var(--txt2);border:1px solid var(--brd)}
 
-/* ── Divider ── */
 hr{border:none;border-top:1px solid var(--brd);margin:24px 0}
 
 /* ── Loading ── */
-.spinner{width:40px;height:40px;border:3px solid var(--brd);border-top-color:var(--acc);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto}
+.spinner{width:36px;height:36px;border:2.5px solid var(--brd2);border-top-color:var(--acc);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto}
 @keyframes spin{to{transform:rotate(360deg)}}
-.loading-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:20px}
-.loading-screen p{color:var(--txt2);font-size:15px}
+.loading-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:16px}
+.loading-screen p{color:var(--txt2);font-size:14px;letter-spacing:.02em}
 
-/* ═══════════════════════════════════════
-   LANDING PAGE
-═══════════════════════════════════════ */
+/* ═══════════ LANDING ═══════════ */
 .landing{display:flex;flex-direction:column;min-height:100vh}
 
-.hero{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:120px 24px 80px;overflow:hidden;min-height:90vh}
-.hero-glow{position:absolute;inset:0;background:radial-gradient(ellipse 60% 40% at 50% 50%,rgba(45,212,191,.12) 0%,transparent 70%);pointer-events:none}
-.hero-nav{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:24px 48px}
-.logo{display:flex;align-items:center;gap:10px;font-size:22px;font-weight:700;color:var(--acc);letter-spacing:-.02em}
-.hero h1{font-size:clamp(40px,7vw,72px);font-weight:700;letter-spacing:-.03em;line-height:1.05;max-width:800px;background:linear-gradient(135deg,#fff 40%,rgba(255,255,255,.7));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:24px}
-.hero p{font-size:20px;color:var(--txt2);max-width:560px;line-height:1.65;margin-bottom:48px}
-.hero-cta{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
+.hero{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:140px 24px 100px;overflow:hidden;min-height:92vh}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 40%,rgba(45,212,191,.09) 0%,transparent 65%),radial-gradient(ellipse 40% 30% at 80% 20%,rgba(129,140,248,.05) 0%,transparent 60%);pointer-events:none}
+.hero::after{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);background-size:64px 64px;mask-image:radial-gradient(ellipse 80% 60% at 50% 40%,black 20%,transparent 75%);pointer-events:none}
 
-.features{padding:80px 48px;max-width:1100px;margin:0 auto;width:100%}
-.features h2{text-align:center;font-size:32px;font-weight:700;letter-spacing:-.02em;margin-bottom:48px}
-.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
-.feature-card{background:var(--bgc);border:1px solid var(--brd);border-radius:16px;padding:32px;transition:border-color .2s,box-shadow .2s}
-.feature-card:hover{border-color:rgba(45,212,191,.3);box-shadow:0 8px 32px rgba(45,212,191,.08)}
-.feature-icon{width:56px;height:56px;border-radius:14px;background:var(--acc-g);display:flex;align-items:center;justify-content:center;margin-bottom:20px;color:var(--acc)}
-.feature-card h3{font-size:18px;font-weight:700;margin-bottom:10px;letter-spacing:-.01em}
-.feature-card p{font-size:15px;color:var(--txt2);line-height:1.6}
+.hero-nav{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:28px 52px;z-index:2}
+.logo{display:flex;align-items:center;gap:9px;font-size:20px;font-weight:800;color:var(--acc);letter-spacing:-.03em}
 
-.how-it-works{padding:80px 48px;background:var(--bg2);width:100%}
-.how-inner{max-width:800px;margin:0 auto}
-.how-it-works h2{text-align:center;font-size:32px;font-weight:700;letter-spacing:-.02em;margin-bottom:48px}
-.steps{display:flex;flex-direction:column;gap:32px}
-.step{display:flex;gap:24px;align-items:flex-start}
-.step-num{flex-shrink:0;width:48px;height:48px;border-radius:50%;background:var(--acc-g);border:1px solid rgba(45,212,191,.3);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:var(--acc)}
-.step-body h3{font-size:18px;font-weight:700;margin-bottom:6px}
-.step-body p{color:var(--txt2);line-height:1.6}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:7px;background:rgba(45,212,191,.08);border:1px solid rgba(45,212,191,.2);border-radius:99px;padding:5px 14px;font-size:12px;font-weight:600;color:var(--acc);letter-spacing:.05em;text-transform:uppercase;margin-bottom:28px}
+.hero-eyebrow-dot{width:6px;height:6px;border-radius:50%;background:var(--acc);animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 
-.landing-footer{padding:40px 48px;text-align:center;border-top:1px solid var(--brd);color:var(--txt2);font-size:14px}
-.landing-footer span{color:var(--acc);font-weight:700}
+.hero h1{font-size:clamp(38px,6.5vw,76px);font-weight:800;letter-spacing:-.04em;line-height:1.02;max-width:820px;background:linear-gradient(160deg,#fff 30%,rgba(255,255,255,.55) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:22px;position:relative;z-index:1}
+.hero p{font-size:18px;color:var(--txt2);max-width:520px;line-height:1.7;margin-bottom:44px;position:relative;z-index:1}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;position:relative;z-index:1}
+.hero-cta .btn-primary{font-size:15px;padding:14px 32px;border-radius:12px;font-weight:700}
+.hero-cta .btn-secondary{font-size:15px;padding:14px 32px;border-radius:12px}
 
-/* ═══════════════════════════════════════
-   ROLE SELECTION
-═══════════════════════════════════════ */
-.role-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:32px;padding:24px;text-align:center}
-.role-screen h2{font-size:28px;font-weight:700;letter-spacing:-.02em}
-.role-screen p{color:var(--txt2);max-width:400px}
-.role-cards{display:flex;gap:20px;flex-wrap:wrap;justify-content:center;margin-top:8px}
-.role-card{background:var(--bgc);border:2px solid var(--brd);border-radius:20px;padding:40px 48px;cursor:pointer;transition:all .2s;min-width:220px}
-.role-card:hover{border-color:var(--acc);box-shadow:0 0 32px rgba(45,212,191,.15);transform:translateY(-2px)}
-.role-card .role-icon{font-size:48px;margin-bottom:16px}
-.role-card h3{font-size:20px;font-weight:700;margin-bottom:8px}
-.role-card p{font-size:14px;color:var(--txt2);line-height:1.5}
+.hero-trust{margin-top:56px;display:flex;align-items:center;gap:8px;color:var(--txt3);font-size:13px;position:relative;z-index:1}
+.hero-trust-divider{width:1px;height:14px;background:var(--brd2)}
 
-/* ═══════════════════════════════════════
-   DASHBOARD LAYOUT
-═══════════════════════════════════════ */
+.features{padding:100px 48px;max-width:1140px;margin:0 auto;width:100%}
+.features-label{text-align:center;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:var(--acc);margin-bottom:16px}
+.features h2{text-align:center;font-size:clamp(28px,4vw,40px);font-weight:800;letter-spacing:-.03em;margin-bottom:56px;line-height:1.1}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+
+.feature-card{background:var(--bgc);border:1px solid var(--brd);border-radius:20px;padding:36px;transition:all .25s cubic-bezier(.4,0,.2,1);cursor:default}
+.feature-card:hover{border-color:rgba(45,212,191,.25);box-shadow:0 24px 64px rgba(0,0,0,.4),var(--sh-acc);transform:translateY(-5px)}
+.feature-icon{width:52px;height:52px;border-radius:14px;background:var(--acc-g);border:1px solid rgba(45,212,191,.2);display:flex;align-items:center;justify-content:center;margin-bottom:22px;color:var(--acc);transition:all .25s}
+.feature-card:hover .feature-icon{background:rgba(45,212,191,.15);box-shadow:0 0 24px rgba(45,212,191,.15)}
+.feature-card h3{font-size:17px;font-weight:700;margin-bottom:10px;letter-spacing:-.02em;color:var(--txt)}
+.feature-card p{font-size:14px;color:var(--txt2);line-height:1.7}
+
+.how-it-works{padding:100px 48px;background:var(--bg2);border-top:1px solid var(--brd);border-bottom:1px solid var(--brd);width:100%}
+.how-inner{max-width:760px;margin:0 auto}
+.how-it-works h2{text-align:center;font-size:clamp(28px,4vw,40px);font-weight:800;letter-spacing:-.03em;margin-bottom:56px}
+.steps-list{display:flex;flex-direction:column;gap:0}
+.step-row{display:flex;gap:28px;position:relative;padding-bottom:40px}
+.step-row:last-child{padding-bottom:0}
+.step-row:last-child .step-line-v{display:none}
+.step-left{display:flex;flex-direction:column;align-items:center;gap:0}
+.step-num{width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,rgba(45,212,191,.2) 0%,rgba(45,212,191,.08) 100%);border:1px solid rgba(45,212,191,.25);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;color:var(--acc);flex-shrink:0;letter-spacing:-.02em}
+.step-line-v{width:1px;flex:1;background:linear-gradient(to bottom,rgba(45,212,191,.2),transparent);margin:8px auto 0}
+.step-body{padding-top:10px}
+.step-body h3{font-size:17px;font-weight:700;margin-bottom:8px;letter-spacing:-.01em}
+.step-body p{color:var(--txt2);line-height:1.7;font-size:14px}
+
+.landing-footer{padding:40px 52px;text-align:center;border-top:1px solid var(--brd);color:var(--txt3);font-size:13px}
+.landing-footer strong{color:var(--acc);font-weight:700}
+
+/* ═══════════ ROLE SELECT ═══════════ */
+.role-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:36px;padding:24px;text-align:center;background:var(--bg)}
+.role-screen h2{font-size:26px;font-weight:800;letter-spacing:-.03em}
+.role-screen p{color:var(--txt2);max-width:380px;font-size:15px}
+.role-cards{display:flex;gap:18px;flex-wrap:wrap;justify-content:center}
+.role-card{background:var(--bgc);border:1px solid var(--brd);border-radius:20px;padding:40px 44px;cursor:pointer;transition:all .2s cubic-bezier(.4,0,.2,1);min-width:210px}
+.role-card:hover{border-color:rgba(45,212,191,.4);box-shadow:0 0 0 4px rgba(45,212,191,.06),var(--sh-lg);transform:translateY(-3px)}
+.role-card .role-icon{font-size:44px;margin-bottom:18px;line-height:1}
+.role-card h3{font-size:18px;font-weight:700;margin-bottom:8px;letter-spacing:-.02em}
+.role-card p{font-size:13px;color:var(--txt2);line-height:1.55}
+
+/* ═══════════ DASHBOARD ═══════════ */
 .dash{display:flex;min-height:100vh}
 
-.sidebar{width:260px;flex-shrink:0;background:#0d0d15;border-right:1px solid var(--brd);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;overflow-y:auto}
-.sb-logo{display:flex;align-items:center;gap:10px;padding:28px 20px 24px;font-size:24px;font-weight:700;color:var(--acc);letter-spacing:-.02em;border-bottom:1px solid var(--brd)}
-.sb-nav{flex:1;padding:16px 12px}
-.sb-nav-item{display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:10px;color:var(--txt2);cursor:pointer;font-size:14px;font-weight:500;transition:all .15s;margin-bottom:4px;border:none;background:none;width:100%;text-align:left}
-.sb-nav-item:hover{background:rgba(45,212,191,.06);color:var(--txt)}
-.sb-nav-item.active{background:rgba(45,212,191,.1);color:var(--acc)}
-.sb-nav-item svg{flex-shrink:0;opacity:.7}
-.sb-nav-item.active svg,.sb-nav-item:hover svg{opacity:1}
-.sb-footer{padding:16px 12px;border-top:1px solid var(--brd)}
-.sb-user{display:flex;align-items:center;gap:12px;padding:10px 16px;border-radius:10px}
-.sb-avatar{width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;background:var(--brd)}
-.sb-avatar-placeholder{width:36px;height:36px;border-radius:50%;background:var(--acc-g);display:flex;align-items:center;justify-content:center;color:var(--acc);font-weight:700;font-size:14px;flex-shrink:0}
+.sidebar{width:256px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--brd);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;overflow-y:auto}
+.sb-logo{display:flex;align-items:center;gap:9px;padding:26px 20px 22px;font-size:21px;font-weight:800;color:var(--acc);letter-spacing:-.04em;border-bottom:1px solid var(--brd)}
+.sb-section{padding:10px 10px 4px;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--txt3);margin-top:4px}
+.sb-nav{flex:1;padding:12px 8px}
+.sb-nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px 9px 14px;border-radius:10px;color:var(--txt2);cursor:pointer;font-size:13.5px;font-weight:500;transition:all .15s;margin-bottom:2px;border:none;background:none;width:100%;text-align:left;position:relative}
+.sb-nav-item:hover{background:rgba(255,255,255,.04);color:var(--txt)}
+.sb-nav-item.active{background:rgba(45,212,191,.08);color:var(--acc);font-weight:600}
+.sb-nav-item.active::before{content:'';position:absolute;left:0;top:6px;bottom:6px;width:3px;background:var(--acc);border-radius:0 3px 3px 0}
+.sb-nav-item svg{flex-shrink:0;opacity:.6;transition:opacity .15s}
+.sb-nav-item:hover svg,.sb-nav-item.active svg{opacity:1}
+.sb-footer{padding:12px 8px 16px;border-top:1px solid var(--brd)}
+.sb-user{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,.03);margin-bottom:8px}
+.sb-avatar{width:34px;height:34px;border-radius:10px;object-fit:cover;flex-shrink:0}
+.sb-avatar-placeholder{width:34px;height:34px;border-radius:10px;background:var(--acc-g);border:1px solid rgba(45,212,191,.2);display:flex;align-items:center;justify-content:center;color:var(--acc);font-weight:700;font-size:13px;flex-shrink:0}
 .sb-user-info{flex:1;min-width:0}
-.sb-user-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sb-user-role{font-size:11px;color:var(--txt2);margin-top:2px}
+.sb-user-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--txt)}
+.sb-user-role{font-size:11px;color:var(--txt2);margin-top:1px}
 
-.main-wrap{margin-left:260px;flex:1;padding:36px 40px;min-height:100vh}
+.main-wrap{margin-left:256px;flex:1;padding:40px 44px;min-height:100vh;max-width:calc(100vw - 256px)}
 
-/* ═══════════════════════════════════════
-   DASHBOARD COMPONENTS
-═══════════════════════════════════════ */
-.page-title{font-size:24px;font-weight:700;letter-spacing:-.02em;margin-bottom:28px}
-.welcome{font-size:28px;font-weight:700;letter-spacing:-.02em;margin-bottom:6px}
-.welcome-sub{color:var(--txt2);font-size:15px;margin-bottom:32px}
+/* ═══════════ DASH COMPONENTS ═══════════ */
+.page-title{font-size:22px;font-weight:800;letter-spacing:-.03em;margin-bottom:28px;color:var(--txt)}
+.welcome{font-size:26px;font-weight:800;letter-spacing:-.03em;margin-bottom:5px}
+.welcome-sub{color:var(--txt2);font-size:14px;margin-bottom:36px}
 
-.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:32px}
-.stat-card{background:var(--bgc);border:1px solid var(--brd);border-radius:16px;padding:24px}
-.stat-label{font-size:.7rem;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--txt2);margin-bottom:10px}
-.stat-num{font-size:36px;font-weight:700;letter-spacing:-.03em;color:var(--txt)}
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px}
+.stat-card{background:var(--bgc);border:1px solid var(--brd);border-radius:16px;padding:22px 24px;transition:border-color .2s}
+.stat-card:hover{border-color:var(--brd2)}
+.stat-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--txt2);margin-bottom:12px}
+.stat-num{font-size:34px;font-weight:800;letter-spacing:-.04em;line-height:1;color:var(--txt)}
 .stat-accent{color:var(--acc)}
+.stat-card-primary{background:linear-gradient(135deg,rgba(45,212,191,.07) 0%,rgba(45,212,191,.02) 100%);border-color:rgba(45,212,191,.18)}
 
-.cta-card{background:var(--bgc);border:1px solid rgba(45,212,191,.25);border-radius:16px;padding:28px;box-shadow:0 0 32px rgba(45,212,191,.06);display:flex;align-items:center;justify-content:space-between;gap:24px;margin-bottom:32px}
-.cta-card h3{font-size:18px;font-weight:700;margin-bottom:6px}
-.cta-card p{color:var(--txt2);font-size:14px}
+.cta-card{background:var(--bgc);border:1px solid rgba(45,212,191,.18);border-radius:16px;padding:28px 32px;box-shadow:var(--sh-acc);display:flex;align-items:center;justify-content:space-between;gap:24px;margin-bottom:32px}
+.cta-card h3{font-size:17px;font-weight:700;margin-bottom:5px;letter-spacing:-.01em}
+.cta-card p{color:var(--txt2);font-size:13px;line-height:1.5}
 
-.section-title{font-size:.75rem;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--txt2);margin-bottom:16px}
+.section-title{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--txt3);margin-bottom:14px}
 
-/* Appointment rows */
-.appt-list{display:flex;flex-direction:column;gap:12px}
-.appt-row{background:var(--bgc);border:1px solid var(--brd);border-radius:12px;padding:16px 20px;display:flex;align-items:center;gap:16px}
-.appt-row:hover{border-color:rgba(255,255,255,.1)}
-.appt-date{font-size:13px;color:var(--txt2);white-space:nowrap;min-width:90px}
-.appt-name{flex:1;font-weight:500;font-size:14px}
-.appt-lang{font-size:13px;color:var(--txt2)}
+.appt-list{display:flex;flex-direction:column;gap:8px}
+.appt-row{background:var(--bgc);border:1px solid var(--brd);border-radius:12px;padding:14px 20px;display:flex;align-items:center;gap:14px;transition:all .15s}
+.appt-row:hover{border-color:var(--brd2);background:var(--bgc2)}
+.appt-date{font-size:12px;color:var(--txt2);white-space:nowrap;min-width:86px;font-weight:500}
+.appt-name{flex:1;font-weight:600;font-size:14px;color:var(--txt)}
+.appt-lang{font-size:12px;color:var(--txt2)}
 .appt-actions{display:flex;gap:8px}
-.empty-state{text-align:center;padding:60px 20px;color:var(--txt2)}
-.empty-state .empty-icon{font-size:48px;margin-bottom:16px;opacity:.5}
-.empty-state p{font-size:15px}
 
-/* Availability toggle */
-.avail-toggle{display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--bgc);border:1px solid var(--brd);border-radius:10px;cursor:pointer;font-weight:600;font-size:14px;border:none;transition:all .2s}
-.avail-toggle.on{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);color:var(--ok)}
-.avail-toggle.off{background:rgba(136,136,160,.08);border:1px solid var(--brd);color:var(--txt2)}
-.avail-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.avail-toggle.on .avail-dot{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+.empty-state{text-align:center;padding:72px 20px}
+.empty-icon{width:64px;height:64px;border-radius:18px;background:var(--bgc2);border:1px solid var(--brd);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:28px}
+.empty-state h3{font-size:16px;font-weight:700;margin-bottom:6px;letter-spacing:-.01em}
+.empty-state p{font-size:14px;color:var(--txt2);line-height:1.6}
+
+.avail-toggle{display:inline-flex;align-items:center;gap:10px;padding:9px 18px;border-radius:99px;cursor:pointer;font-weight:600;font-size:13px;border:none;transition:all .2s}
+.avail-toggle.on{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);color:#4ade80}
+.avail-toggle.off{background:rgba(107,107,144,.08);border:1px solid var(--brd);color:var(--txt2)}
+.avail-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;transition:all .2s}
+.avail-toggle.on .avail-dot{background:var(--ok);box-shadow:0 0 8px rgba(34,197,94,.6)}
 .avail-toggle.off .avail-dot{background:var(--txt3)}
 
-/* Queue cards */
-.queue-list{display:flex;flex-direction:column;gap:16px}
-.queue-card{background:var(--bgc);border:1px solid var(--brd);border-radius:16px;padding:20px;transition:border-color .2s}
-.queue-card:hover{border-color:rgba(45,212,191,.25)}
-.queue-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:12px}
-.queue-patient{font-weight:700;font-size:16px}
-.queue-meta{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--txt2);margin-bottom:12px}
-.queue-summary{background:#0d0d15;border:1px solid var(--brd);border-radius:8px;padding:12px;font-size:13px;color:var(--txt2);line-height:1.5;margin-bottom:16px}
+.queue-list{display:flex;flex-direction:column;gap:14px}
+.queue-card{background:var(--bgc);border:1px solid var(--brd);border-radius:16px;padding:22px;transition:all .2s}
+.queue-card:hover{border-color:rgba(45,212,191,.2);box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.queue-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:12px}
+.queue-patient{font-weight:700;font-size:16px;letter-spacing:-.02em}
+.queue-meta{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--txt2);margin-bottom:14px;flex-wrap:wrap}
+.queue-summary{background:rgba(0,0,0,.25);border:1px solid var(--brd);border-radius:10px;padding:14px;font-size:13px;color:var(--txt2);line-height:1.6;margin-bottom:16px}
 .queue-actions{display:flex;gap:10px}
-.queue-detail{display:none;margin-bottom:12px}
+.queue-detail{display:none;margin-bottom:12px;font-size:13px;color:var(--txt2);line-height:1.6}
 .queue-detail.open{display:block}
 
-/* ═══════════════════════════════════════
-   NEW APPOINTMENT FLOW
-═══════════════════════════════════════ */
+/* ═══════════ INTAKE FLOW ═══════════ */
 .step-indicator{display:flex;align-items:center;margin-bottom:36px}
-.step-item{display:flex;align-items:center;gap:10px;flex-shrink:0}
-.step-circle{width:32px;height:32px;border-radius:50%;border:2px solid var(--brd);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--txt2);transition:all .2s}
-.step-item.active .step-circle{border-color:var(--acc);color:var(--acc);background:var(--acc-g)}
-.step-item.done .step-circle{background:var(--acc);border-color:var(--acc);color:#0a0a0f}
-.step-label{font-size:13px;font-weight:500;color:var(--txt2)}
-.step-item.active .step-label{color:var(--txt)}
-.step-line{flex:1;height:1px;background:var(--brd);margin:0 12px;min-width:20px}
+.step-item{display:flex;align-items:center;gap:9px;flex-shrink:0}
+.step-circle{width:30px;height:30px;border-radius:50%;border:2px solid var(--brd2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--txt3);transition:all .2s}
+.step-item.active .step-circle{border-color:var(--acc);color:var(--acc);background:rgba(45,212,191,.1)}
+.step-item.done .step-circle{background:var(--acc);border-color:var(--acc);color:#04100f}
+.step-label{font-size:13px;font-weight:500;color:var(--txt3)}
+.step-item.active .step-label,.step-item.done .step-label{color:var(--txt)}
+.step-line{flex:1;height:1px;background:var(--brd);margin:0 12px;min-width:16px;transition:background .3s}
 .step-line.done{background:var(--acc)}
 
-.intake-box{max-width:720px}
+.intake-box{max-width:700px}
 .intake-input-wrap{position:relative}
-.voice-btn{position:absolute;bottom:14px;right:14px;width:36px;height:36px;border-radius:8px;background:var(--acc-g);border:1px solid rgba(45,212,191,.3);color:var(--acc);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s}
-.voice-btn:hover{background:rgba(45,212,191,.25)}
-.voice-btn.recording{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.4);color:var(--err);animation:pulse-btn .8s ease-in-out infinite}
-@keyframes pulse-btn{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.3)}50%{box-shadow:0 0 0 6px rgba(239,68,68,0)}}
+.voice-btn{position:absolute;bottom:12px;right:12px;width:34px;height:34px;border-radius:8px;background:var(--acc-g);border:1px solid rgba(45,212,191,.2);color:var(--acc);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s}
+.voice-btn:hover{background:rgba(45,212,191,.2)}
+.voice-btn.recording{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.3);color:var(--err);animation:pulse-btn .9s ease-in-out infinite}
+@keyframes pulse-btn{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.3)}50%{box-shadow:0 0 0 7px rgba(239,68,68,0)}}
+.lang-select-wrap{margin-top:18px;max-width:280px}
 
-.lang-select-wrap{margin-top:20px;max-width:300px}
-
-/* Intake review */
-.intake-review{background:#0d0d15;border:1px solid var(--brd);border-radius:12px;padding:20px;margin-bottom:24px}
+.intake-review{background:rgba(0,0,0,.25);border:1px solid var(--brd);border-radius:14px;padding:20px;margin-bottom:24px}
 .intake-field{display:flex;gap:16px;padding:12px 0;border-bottom:1px solid var(--brd)}
 .intake-field:last-child{border-bottom:none}
-.intake-field-label{font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--txt2);width:120px;flex-shrink:0;padding-top:2px}
-.intake-field-value{font-size:14px;color:var(--txt)}
-.symptoms-list{display:flex;flex-wrap:wrap;gap:8px}
-.symptom-tag{background:var(--acc-g);color:var(--acc);padding:4px 10px;border-radius:6px;font-size:12px;font-weight:500}
+.intake-field-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--txt3);width:110px;flex-shrink:0;padding-top:2px}
+.intake-field-value{font-size:14px;color:var(--txt);line-height:1.5}
+.symptoms-list{display:flex;flex-wrap:wrap;gap:6px}
+.symptom-tag{background:var(--acc-g);border:1px solid rgba(45,212,191,.2);color:var(--acc);padding:3px 10px;border-radius:6px;font-size:12px;font-weight:500}
 
-/* Waiting room */
 .waiting-room{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 24px;text-align:center;min-height:60vh}
-.pulse-wrap{position:relative;width:120px;height:120px;margin-bottom:32px}
-.pulse-ring{position:absolute;inset:-20px;border-radius:50%;border:2px solid rgba(45,212,191,.2);animation:ring-pulse 2s ease-out infinite}
-.pulse-ring:nth-child(2){animation-delay:.5s}
-.pulse-ring:nth-child(3){animation-delay:1s}
-.pulse-circle{width:120px;height:120px;border-radius:50%;background:var(--acc-g);border:2px solid rgba(45,212,191,.4);display:flex;align-items:center;justify-content:center;color:var(--acc)}
-@keyframes ring-pulse{0%{transform:scale(.8);opacity:.8}100%{transform:scale(1.6);opacity:0}}
-.waiting-room h2{font-size:22px;font-weight:700;margin-bottom:10px}
-.waiting-room p{color:var(--txt2);font-size:15px;margin-bottom:32px}
+.pulse-wrap{position:relative;width:100px;height:100px;margin-bottom:36px}
+.pulse-ring{position:absolute;inset:-20px;border-radius:50%;border:1.5px solid rgba(45,212,191,.15);animation:ring-pulse 2.2s ease-out infinite}
+.pulse-ring:nth-child(2){animation-delay:.6s}
+.pulse-ring:nth-child(3){animation-delay:1.2s}
+.pulse-circle{width:100px;height:100px;border-radius:50%;background:linear-gradient(135deg,rgba(45,212,191,.12),rgba(45,212,191,.04));border:1px solid rgba(45,212,191,.3);display:flex;align-items:center;justify-content:center;color:var(--acc)}
+@keyframes ring-pulse{0%{transform:scale(.8);opacity:.7}100%{transform:scale(1.7);opacity:0}}
+.waiting-room h2{font-size:21px;font-weight:800;letter-spacing:-.02em;margin-bottom:10px}
+.waiting-room p{color:var(--txt2);font-size:14px;margin-bottom:32px;line-height:1.7;max-width:400px}
 
-/* ═══════════════════════════════════════
-   VIDEO ROOM
-═══════════════════════════════════════ */
-.video-room{display:flex;height:100vh;background:var(--bg);overflow:hidden}
+/* ═══════════ VIDEO ═══════════ */
+.video-room{display:flex;height:100vh;background:#030308;overflow:hidden}
 .video-col{flex:1;position:relative;min-width:0}
 .video-col iframe{width:100%;height:100%;border:none;display:block}
-.video-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:var(--bg2);color:var(--txt2)}
-.video-placeholder svg{opacity:.4}
-.video-topbar{position:absolute;top:0;left:0;right:0;background:linear-gradient(to bottom,rgba(0,0,0,.7) 0%,transparent 100%);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;z-index:10}
-.video-topbar .call-info{display:flex;align-items:center;gap:12px}
-.conn-dot{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 6px var(--ok)}
-.call-timer{font-size:14px;font-weight:600;color:var(--txt)}
-.video-bottombar{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(0,0,0,.8) 0%,transparent 100%);padding:24px;display:flex;align-items:center;justify-content:center;gap:16px;z-index:10}
-.ctrl-btn{width:48px;height:48px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;color:#fff}
-.ctrl-btn.ctrl-default{background:rgba(255,255,255,.15)}
-.ctrl-btn.ctrl-default:hover{background:rgba(255,255,255,.25)}
-.ctrl-btn.ctrl-end{background:var(--err);width:56px;height:56px}
-.ctrl-btn.ctrl-end:hover{background:#dc2626;transform:scale(1.05)}
-.ctrl-btn.ctrl-muted{background:rgba(239,68,68,.2);border:1px solid rgba(239,68,68,.4)}
+.video-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:var(--bg2);color:var(--txt2);font-size:14px}
+.video-placeholder svg{opacity:.25}
+.video-topbar{position:absolute;top:0;left:0;right:0;background:linear-gradient(to bottom,rgba(0,0,0,.75),transparent);padding:16px 22px;display:flex;align-items:center;justify-content:space-between;z-index:10}
+.call-info{display:flex;align-items:center;gap:10px}
+.conn-dot{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px rgba(34,197,94,.7)}
+.video-bottombar{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(0,0,0,.85),transparent);padding:24px;display:flex;align-items:center;justify-content:center;gap:14px;z-index:10}
+.ctrl-btn{width:46px;height:46px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s;color:#fff;backdrop-filter:blur(8px)}
+.ctrl-btn.ctrl-default{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.1)}
+.ctrl-btn.ctrl-default:hover{background:rgba(255,255,255,.22)}
+.ctrl-btn.ctrl-end{background:var(--err);width:54px;height:54px;box-shadow:0 4px 20px rgba(239,68,68,.4)}
+.ctrl-btn.ctrl-end:hover{background:#dc2626;transform:scale(1.06)}
+.ctrl-btn.ctrl-muted{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3)}
 
-.translate-panel{width:320px;flex-shrink:0;background:var(--bg2);border-left:1px solid var(--brd);display:flex;flex-direction:column}
-.tp-header{padding:16px 20px;border-bottom:1px solid var(--brd);flex-shrink:0}
-.tp-header h3{font-size:14px;font-weight:700;margin-bottom:4px}
+.translate-panel{width:300px;flex-shrink:0;background:var(--bg2);border-left:1px solid var(--brd);display:flex;flex-direction:column}
+.tp-header{padding:18px 20px;border-bottom:1px solid var(--brd);flex-shrink:0;background:rgba(0,0,0,.2)}
+.tp-header h3{font-size:13px;font-weight:700;margin-bottom:3px;letter-spacing:.01em}
 .tp-header p{font-size:12px;color:var(--txt2)}
-.tp-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
-.msg-bubble{padding:12px 14px;border-radius:12px;max-width:100%}
-.msg-bubble.msg-me{background:var(--acc-g);border:1px solid rgba(45,212,191,.2);align-self:flex-end}
+.tp-messages{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
+.msg-bubble{padding:11px 14px;border-radius:12px;max-width:100%;transition:all .15s}
+.msg-bubble.msg-me{background:rgba(45,212,191,.1);border:1px solid rgba(45,212,191,.18)}
 .msg-bubble.msg-other{background:var(--bgc);border:1px solid var(--brd)}
-.msg-original{font-size:11px;color:var(--txt2);margin-bottom:4px;line-height:1.4}
-.msg-translated{font-size:14px;color:var(--txt);line-height:1.5}
-.msg-ts{font-size:10px;color:var(--txt3);margin-top:4px}
-.tp-footer{padding:12px 16px;border-top:1px solid var(--brd);display:flex;gap:8px;flex-shrink:0}
-.tp-footer .input{padding:10px 14px;font-size:14px}
-.tp-send{width:40px;height:40px;border-radius:8px;background:var(--acc);border:none;color:#0a0a0f;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s}
+.msg-original{font-size:11px;color:var(--txt3);margin-bottom:4px;line-height:1.4;font-style:italic}
+.msg-translated{font-size:13.5px;color:var(--txt);line-height:1.55}
+.msg-ts{font-size:10px;color:var(--txt3);margin-top:5px}
+.tp-footer{padding:12px 14px;border-top:1px solid var(--brd);display:flex;gap:8px;flex-shrink:0}
+.tp-footer .input{padding:9px 13px;font-size:13px;border-radius:8px}
+.tp-send{width:38px;height:38px;border-radius:8px;background:var(--acc);border:none;color:#04100f;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .18s}
 .tp-send:hover{background:var(--acc-h)}
 
-/* End call notes modal */
-.notes-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:100;padding:24px}
-.notes-modal{background:var(--bgc);border:1px solid var(--brd);border-radius:20px;padding:32px;width:100%;max-width:520px}
-.notes-modal h2{font-size:20px;font-weight:700;margin-bottom:8px}
-.notes-modal p{color:var(--txt2);font-size:14px;margin-bottom:20px}
+.notes-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;z-index:100;padding:24px;backdrop-filter:blur(4px)}
+.notes-modal{background:var(--bgc);border:1px solid var(--brd2);border-radius:20px;padding:36px;width:100%;max-width:500px;box-shadow:var(--sh-lg)}
+.notes-modal h2{font-size:20px;font-weight:800;letter-spacing:-.02em;margin-bottom:8px}
+.notes-modal p{color:var(--txt2);font-size:13px;margin-bottom:22px;line-height:1.6}
 
-/* ═══════════════════════════════════════
-   SUMMARY PAGE
-═══════════════════════════════════════ */
-.summary-page{max-width:700px;margin:0 auto;padding:40px 24px}
-.summary-header{text-align:center;margin-bottom:40px}
-.summary-header h1{font-size:28px;font-weight:700;letter-spacing:-.02em;margin-bottom:8px}
-.summary-header p{color:var(--txt2);font-size:15px}
-.summary-section{margin-bottom:24px}
-.summary-section h3{font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--txt2);margin-bottom:12px}
-.summary-section p{font-size:15px;line-height:1.7;color:var(--txt)}
-.next-steps{display:flex;flex-direction:column;gap:10px}
-.next-step{display:flex;gap:14px;align-items:flex-start;padding:12px;background:#0d0d15;border-radius:8px;border:1px solid var(--brd)}
-.step-n{width:26px;height:26px;border-radius:50%;background:var(--acc-g);color:var(--acc);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+/* ═══════════ SUMMARY ═══════════ */
+.summary-page{max-width:680px;margin:0 auto;padding:48px 24px}
+.summary-header{text-align:center;margin-bottom:44px}
+.summary-header h1{font-size:28px;font-weight:800;letter-spacing:-.03em;margin-bottom:10px}
+.summary-header p{color:var(--txt2);font-size:14px;line-height:1.6}
+.summary-section h3{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--txt3);margin-bottom:14px}
+.summary-section p{font-size:15px;line-height:1.75;color:var(--txt)}
+.next-steps{display:flex;flex-direction:column;gap:8px}
+.next-step{display:flex;gap:14px;align-items:flex-start;padding:14px;background:rgba(0,0,0,.2);border-radius:10px;border:1px solid var(--brd)}
+.step-n{width:24px;height:24px;border-radius:8px;background:var(--acc-g);border:1px solid rgba(45,212,191,.2);color:var(--acc);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
 .meds{display:flex;flex-wrap:wrap;gap:8px}
-.med-badge{background:rgba(129,140,248,.12);border:1px solid rgba(129,140,248,.25);color:var(--doc);padding:6px 14px;border-radius:20px;font-size:13px;font-weight:500}
-.followup-box{background:rgba(45,212,191,.06);border:1px solid rgba(45,212,191,.2);border-radius:10px;padding:16px;font-size:14px;color:var(--txt)}
-.summary-actions{display:flex;gap:12px;justify-content:center;margin-top:40px;flex-wrap:wrap}
+.med-badge{background:rgba(129,140,248,.1);border:1px solid rgba(129,140,248,.2);color:#a5b4fc;padding:5px 14px;border-radius:99px;font-size:13px;font-weight:500}
+.followup-box{background:rgba(45,212,191,.05);border:1px solid rgba(45,212,191,.15);border-radius:12px;padding:16px 18px;font-size:14px;color:var(--txt);line-height:1.6}
+.summary-actions{display:flex;gap:12px;justify-content:center;margin-top:44px;flex-wrap:wrap}
 
-/* ═══════════════════════════════════════
-   MISC
-═══════════════════════════════════════ */
+/* ═══════════ MISC ═══════════ */
 .form-group{margin-bottom:20px}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.tip-card{background:rgba(45,212,191,.06);border:1px solid rgba(45,212,191,.15);border-radius:12px;padding:20px}
-.tip-card p{font-size:14px;color:var(--txt2);line-height:1.6}
-.health-summary-card p{font-size:15px;color:var(--txt2);line-height:1.7}
+.tip-card{background:rgba(45,212,191,.05);border:1px solid rgba(45,212,191,.12);border-radius:14px;padding:20px 22px}
+.tip-card p{font-size:14px;color:var(--txt2);line-height:1.65}
 
-/* ═══════════════════════════════════════
-   RESPONSIVE
-═══════════════════════════════════════ */
-@media(max-width:900px){
+/* ═══════════ RESPONSIVE ═══════════ */
+@media(max-width:960px){
   .features-grid{grid-template-columns:1fr}
   .stats-row{grid-template-columns:1fr 1fr}
-  .hero-nav{padding:16px 24px}
-  .features,.how-it-works{padding:60px 24px}
+  .hero-nav{padding:20px 24px}
+  .features,.how-it-works{padding:72px 24px}
 }
 @media(max-width:768px){
-  .sidebar{width:100%;height:60px;bottom:auto;flex-direction:row;border-right:none;border-bottom:1px solid var(--brd);overflow:hidden}
-  .sb-logo{padding:0 16px;border-bottom:none;border-right:1px solid var(--brd);font-size:18px;height:60px}
-  .sb-nav{display:flex;flex-direction:row;padding:0 8px;align-items:center;overflow-x:auto;flex:1;gap:0}
-  .sb-nav-item{flex-direction:column;gap:2px;font-size:10px;padding:8px;min-width:56px;border-radius:8px;flex-shrink:0}
+  .sidebar{width:100%;height:58px;bottom:auto;flex-direction:row;border-right:none;border-bottom:1px solid var(--brd);overflow:hidden;z-index:50}
+  .sb-logo{padding:0 16px;border-bottom:none;border-right:1px solid var(--brd);font-size:17px;height:58px;min-width:80px}
+  .sb-nav{display:flex;flex-direction:row;padding:0 6px;align-items:center;overflow-x:auto;flex:1;gap:0;scrollbar-width:none}
+  .sb-nav::-webkit-scrollbar{display:none}
+  .sb-nav-item{flex-direction:column;gap:2px;font-size:10px;padding:6px 8px;min-width:52px;border-radius:8px;flex-shrink:0}
+  .sb-nav-item.active::before{display:none}
+  .sb-section{display:none}
   .sb-footer{display:none}
-  .main-wrap{margin-left:0;margin-top:60px;padding:20px 16px}
+  .main-wrap{margin-left:0;margin-top:58px;padding:20px 16px;max-width:100vw}
   .video-room{flex-direction:column}
-  .translate-panel{width:100%;height:240px;border-left:none;border-top:1px solid var(--brd)}
+  .translate-panel{width:100%;height:220px;border-left:none;border-top:1px solid var(--brd)}
   .stats-row{grid-template-columns:1fr}
-  .cta-card{flex-direction:column}
-  .appt-row{flex-wrap:wrap}
+  .cta-card{flex-direction:column;align-items:flex-start}
+  .appt-row{flex-wrap:wrap;gap:10px}
 }
 @media(max-width:480px){
-  .hero h1{font-size:32px}
+  .hero h1{font-size:34px}
   .hero p{font-size:16px}
-  .hero-cta{flex-direction:column;align-items:center}
+  .hero-cta{flex-direction:column;align-items:stretch;width:100%;max-width:280px}
   .role-cards{flex-direction:column;align-items:center}
-  .role-card{width:100%;max-width:320px}
+  .role-card{width:100%;max-width:300px}
+  .features h2,.how-it-works h2{font-size:26px}
 }
 </style>
 </head>
@@ -649,7 +655,7 @@ function ensureToast() {
     t.className = 'toast';
     document.body.appendChild(t);
     const style = document.createElement('style');
-    style.textContent = `.toast{position:fixed;bottom:24px;right:24px;background:#1e1e2e;border:1px solid var(--brd);color:var(--txt);padding:12px 20px;border-radius:10px;font-size:14px;z-index:9999;opacity:0;transform:translateY(8px);transition:all .2s;pointer-events:none}.toast.show{opacity:1;transform:none}.toast-ok{border-color:rgba(34,197,94,.3)}.toast-err{border-color:rgba(239,68,68,.3)}`;
+    style.textContent = `.toast{position:fixed;bottom:28px;right:28px;background:var(--bgc2);border:1px solid var(--brd2);color:var(--txt);padding:11px 18px;border-radius:10px;font-size:13.5px;font-weight:500;z-index:9999;opacity:0;transform:translateY(10px);transition:all .22s cubic-bezier(.4,0,.2,1);pointer-events:none;max-width:320px;box-shadow:var(--sh-lg)}.toast.show{opacity:1;transform:none}.toast-ok{border-color:rgba(34,197,94,.3);color:#4ade80}.toast-err{border-color:rgba(239,68,68,.3);color:#f87171}`;
     document.head.appendChild(style);
   }
 }
@@ -666,42 +672,52 @@ function renderLanding() {
   return `
 <div class="landing">
   <section class="hero">
-    <div class="hero-glow"></div>
     <nav class="hero-nav">
-      ${renderLogo(22)}
-      ${S.user ? `<button class="btn btn-secondary btn-sm" onclick="navigate('dashboard')">Dashboard</button>` : `<button class="btn btn-secondary btn-sm" onclick="handleLogin('')">Sign in</button>`}
+      ${renderLogo(21)}
+      <div style="display:flex;gap:10px;align-items:center">
+        ${S.user ? `<button class="btn btn-primary btn-sm" onclick="navigate('dashboard')">Go to dashboard</button>` : `<button class="btn btn-secondary btn-sm" onclick="handleLogin('')">Sign in</button>`}
+      </div>
     </nav>
+    <div class="hero-eyebrow"><span class="hero-eyebrow-dot"></span>Free · No insurance needed</div>
     <h1>Healthcare without barriers</h1>
-    <p>Vela connects patients with volunteer doctors through AI-assisted video calls — in your language, on your schedule.</p>
+    <p>Connect with volunteer doctors through AI-assisted video calls — in your language, on your schedule, completely free.</p>
     <div class="hero-cta">
-      <button class="btn btn-primary" style="font-size:17px;padding:16px 36px" onclick="handleLogin('patient')">I need care</button>
-      <button class="btn btn-secondary" style="font-size:17px;padding:16px 36px" onclick="handleLogin('doctor')">I'm a doctor</button>
+      <button class="btn btn-primary" onclick="handleLogin('patient')">I need care</button>
+      <button class="btn btn-secondary" onclick="handleLogin('doctor')">I'm a volunteer doctor</button>
+    </div>
+    <div class="hero-trust">
+      <span>25+ languages</span>
+      <div class="hero-trust-divider"></div>
+      <span>AI-powered intake</span>
+      <div class="hero-trust-divider"></div>
+      <span>Real volunteer doctors</span>
     </div>
   </section>
 
   <section class="features">
-    <h2>Everything you need, nothing you don't</h2>
+    <div class="features-label">What Vela offers</div>
+    <h2>Everything you need,<br>nothing you don't</h2>
     <div class="features-grid">
       <div class="feature-card">
         <div class="feature-icon">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
         </div>
         <h3>Smart AI Intake</h3>
-        <p>Describe your symptoms in your own words. Our AI understands plain language and creates a structured summary for your doctor — no medical jargon needed.</p>
+        <p>Describe your symptoms in plain language — type or use your voice. Our AI creates a structured medical summary for your doctor. No jargon needed.</p>
       </div>
       <div class="feature-card">
         <div class="feature-icon">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
         </div>
         <h3>Live Translation</h3>
-        <p>Speak your language. A real-time translation chat sidebar ensures you and your doctor always understand each other, in 25+ languages.</p>
+        <p>Speak your language. A real-time translation sidebar keeps you and your doctor in sync — across 25+ languages, including less common ones.</p>
       </div>
       <div class="feature-card">
         <div class="feature-icon">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
         </div>
-        <h3>Plain-Language Follow-up</h3>
-        <p>After your visit, receive a clear summary of what was discussed, your next steps, and any medications — written simply, in your language.</p>
+        <h3>Plain-Language Summary</h3>
+        <p>After your visit, get a clear written summary of what was discussed, your next steps, and any medications — in your language, ready to download.</p>
       </div>
     </div>
   </section>
@@ -709,26 +725,34 @@ function renderLanding() {
   <section class="how-it-works">
     <div class="how-inner">
       <h2>How it works</h2>
-      <div class="steps">
-        <div class="step">
-          <div class="step-num">1</div>
+      <div class="steps-list">
+        <div class="step-row">
+          <div class="step-left">
+            <div class="step-num">1</div>
+            <div class="step-line-v"></div>
+          </div>
           <div class="step-body">
             <h3>Describe your symptoms</h3>
-            <p>Tell us what's going on in your own words — by typing or using voice input. Select your preferred language. No medical training required.</p>
+            <p>Type or speak what's going on in your own words. Choose your preferred language. No medical knowledge needed — just be honest about how you feel.</p>
           </div>
         </div>
-        <div class="step">
-          <div class="step-num">2</div>
+        <div class="step-row">
+          <div class="step-left">
+            <div class="step-num">2</div>
+            <div class="step-line-v"></div>
+          </div>
           <div class="step-body">
             <h3>Connect with a volunteer doctor</h3>
-            <p>A volunteer doctor reviews your AI-generated intake summary and joins your video call. Real doctor, real care — completely free.</p>
+            <p>A licensed volunteer doctor reviews your AI intake summary and joins your video call. Real care from real doctors — completely free, no insurance required.</p>
           </div>
         </div>
-        <div class="step">
-          <div class="step-num">3</div>
+        <div class="step-row">
+          <div class="step-left">
+            <div class="step-num">3</div>
+          </div>
           <div class="step-body">
             <h3>Get your visit summary</h3>
-            <p>After your call, receive a plain-language summary of everything discussed, next steps, and follow-up guidance — all in your language.</p>
+            <p>After your call, receive a plain-language summary of everything discussed, next steps, and follow-up guidance — downloadable and in your language.</p>
           </div>
         </div>
       </div>
@@ -736,7 +760,7 @@ function renderLanding() {
   </section>
 
   <footer class="landing-footer">
-    <span>Vela</span> — Healthcare without barriers &nbsp;·&nbsp; Free to use, built on volunteer care
+    <strong>Vela</strong> &nbsp;—&nbsp; Healthcare without barriers &nbsp;·&nbsp; Free to use &nbsp;·&nbsp; Built on volunteer care
   </footer>
 </div>`;
 }
@@ -856,11 +880,11 @@ function renderPatientHome() {
   const recent = appts.slice(0, 5);
 
   return `
-<div class="welcome">${greet()}, ${firstName(S.user?.name)} 👋</div>
+<div class="welcome">${greet()}, ${firstName(S.user?.name)}</div>
 <div class="welcome-sub">Here's your health overview.</div>
 
 <div class="stats-row">
-  <div class="stat-card"><div class="stat-label">Total Appointments</div><div class="stat-num stat-accent">${total}</div></div>
+  <div class="stat-card stat-card-primary"><div class="stat-label">Total Appointments</div><div class="stat-num stat-accent">${total}</div></div>
   <div class="stat-card"><div class="stat-label">Upcoming</div><div class="stat-num">${upcoming}</div></div>
   <div class="stat-card"><div class="stat-label">Completed</div><div class="stat-num">${done}</div></div>
 </div>
@@ -875,7 +899,11 @@ function renderPatientHome() {
 
 <div class="section-title">Recent appointments</div>
 ${recent.length === 0
-  ? `<div class="empty-state"><div class="empty-icon">📋</div><p>No appointments yet. Start one above!</p></div>`
+  ? `<div class="empty-state">
+      <div class="empty-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+      <h3>No appointments yet</h3>
+      <p>Start your first appointment above — it only takes a minute.</p>
+    </div>`
   : `<div class="appt-list">
       ${recent.map(a => `
       <div class="appt-row">
@@ -883,9 +911,11 @@ ${recent.length === 0
         <div class="appt-name">${a.doctor_name || '<span style="color:var(--txt2)">Awaiting doctor</span>'}</div>
         <div class="appt-lang">${langFlag(a.language)} ${langName(a.language)}</div>
         ${statusBadge(a.status)}
-        ${a.status === 'completed' ? `<button class="btn btn-secondary btn-sm" onclick="viewSummary('${a.id}')">View Summary</button>` : ''}
-        ${a.status === 'active' ? `<button class="btn btn-primary btn-sm" onclick="rejoinCall('${a.id}')">Rejoin Call</button>` : ''}
-        ${a.status === 'pending' ? `<button class="btn btn-ghost" onclick="cancelAppt('${a.id}')">Cancel</button>` : ''}
+        <div class="appt-actions">
+          ${a.status === 'completed' ? `<button class="btn btn-secondary btn-sm" onclick="viewSummary('${a.id}')">View Summary</button>` : ''}
+          ${a.status === 'active' ? `<button class="btn btn-primary btn-sm" onclick="rejoinCall('${a.id}')">Rejoin Call</button>` : ''}
+          ${a.status === 'pending' ? `<button class="btn btn-ghost" onclick="cancelAppt('${a.id}')">Cancel</button>` : ''}
+        </div>
       </div>`).join('')}
     </div>`
 }`;
@@ -1009,7 +1039,12 @@ function renderPatientAppts() {
   const appts = S.appointments;
   if (appts.length === 0) return `
 <div class="page-title">My Appointments</div>
-<div class="empty-state"><div class="empty-icon">📋</div><p>No appointments yet.<br><button class="btn btn-primary btn-sm" style="margin-top:16px" onclick="subnav('new_appt')">Start your first appointment</button></p></div>`;
+<div class="empty-state">
+  <div class="empty-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+  <h3>No appointments yet</h3>
+  <p style="margin-bottom:20px">Your appointments will appear here once you start one.</p>
+  <button class="btn btn-primary btn-sm" onclick="subnav('new_appt')">Start your first appointment</button>
+</div>`;
 
   return `
 <div class="page-title">My Appointments</div>
@@ -1035,7 +1070,11 @@ function renderHealth() {
   const completed = S.appointments.filter(a => a.status === 'completed');
   if (completed.length === 0) return `
 <div class="page-title">My Health Summary</div>
-<div class="empty-state"><div class="empty-icon">💊</div><p>Complete an appointment to see your health summary here.</p></div>`;
+<div class="empty-state">
+  <div class="empty-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div>
+  <h3>No health data yet</h3>
+  <p>Complete your first appointment to see your health summary here.</p>
+</div>`;
 
   const allMeds = completed.flatMap(a => a.post_call_summary?.medications || []).filter(Boolean);
   const uniqueMeds = [...new Set(allMeds)];
@@ -1085,26 +1124,26 @@ function renderDoctorHome() {
   const isAvail = S.user?.available;
 
   return `
-<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:32px;gap:16px;flex-wrap:wrap">
+<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:36px;gap:16px;flex-wrap:wrap">
   <div>
-    <div class="welcome">${greet()}, Dr. ${firstName(S.user?.name)} 👋</div>
+    <div class="welcome">${greet()}, Dr. ${firstName(S.user?.name)}</div>
     <div class="welcome-sub">Thank you for volunteering your time.</div>
   </div>
   <button class="avail-toggle ${isAvail?'on':'off'}" onclick="handleToggleAvail()">
     <div class="avail-dot"></div>
-    ${isAvail ? 'Available' : 'Unavailable'}
+    ${isAvail ? 'Available for patients' : 'Set as unavailable'}
   </button>
 </div>
 
-<div class="stats-row" style="margin-bottom:32px">
-  <div class="stat-card"><div class="stat-label">Patients Helped</div><div class="stat-num stat-accent">${helped}</div></div>
+<div class="stats-row">
+  <div class="stat-card stat-card-primary"><div class="stat-label">Patients Helped</div><div class="stat-num stat-accent">${helped}</div></div>
   <div class="stat-card"><div class="stat-label">This Week</div><div class="stat-num">${week}</div></div>
-  <div class="stat-card"><div class="stat-label">Hours Volunteered</div><div class="stat-num">${hours}</div></div>
+  <div class="stat-card"><div class="stat-label">Est. Hours</div><div class="stat-num">${hours}</div></div>
 </div>
 
-<div class="tip-card" style="margin-bottom:24px">
-  <div style="font-weight:700;margin-bottom:6px;color:var(--acc)">💙 Thank you for volunteering</div>
-  <p class="tip-card p">Every appointment you complete gives someone access to care they couldn't otherwise get. Toggle "Available" above to start receiving patients from the queue.</p>
+<div class="tip-card" style="margin-bottom:28px">
+  <div style="font-size:13px;font-weight:700;color:var(--acc);margin-bottom:6px;letter-spacing:.01em">Thank you for volunteering</div>
+  <p>Every appointment you complete gives someone access to care they couldn't otherwise get. Toggle your availability above to start receiving patients from the queue.</p>
 </div>
 
 <div class="section-title">Quick actions</div>
@@ -1124,7 +1163,11 @@ function renderQueue() {
   <button class="btn btn-secondary btn-sm" onclick="refreshQueue()">Refresh</button>
 </div>
 ${q.length === 0
-  ? `<div class="empty-state"><div class="empty-icon">🩺</div><p>No patients waiting right now.<br>Check back soon or refresh the queue.</p></div>`
+  ? `<div class="empty-state">
+      <div class="empty-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+      <h3>Queue is empty</h3>
+      <p>No patients waiting right now. Check back soon or refresh.</p>
+    </div>`
   : `<div class="queue-list">
     ${q.map(a => {
       const s = a.intake_summary || {};
@@ -1133,13 +1176,12 @@ ${q.length === 0
       <div class="queue-card">
         <div class="queue-header">
           <div class="queue-patient">${maskName(a.patient_name)}</div>
-          <div style="display:flex;gap:8px;align-items:center">
-            ${severityBadge(s.severity)}
-            <span class="badge badge-muted">${langFlag(a.language)} ${langName(a.language)}</span>
-          </div>
+          ${severityBadge(s.severity)}
         </div>
         <div class="queue-meta">
-          <span>${ICO.clock} ${waitingTime(a.created_at)}</span>
+          <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>${waitingTime(a.created_at)}</span>
+          <span style="color:var(--brd2)">·</span>
+          <span>${langFlag(a.language)} ${langName(a.language)}</span>
         </div>
         <div class="queue-summary">
           <strong>Chief complaint:</strong> ${s.chief_complaint || 'Not specified'}<br>
@@ -1164,7 +1206,11 @@ function renderDoctorAppts() {
   const appts = S.appointments;
   if (appts.length === 0) return `
 <div class="page-title">My Appointments</div>
-<div class="empty-state"><div class="empty-icon">📋</div><p>You haven't seen any patients yet.<br>Toggle "Available" in the dashboard to start receiving patients.</p></div>`;
+<div class="empty-state">
+  <div class="empty-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+  <h3>No appointments yet</h3>
+  <p>Toggle "Available" on the home screen to start receiving patients from the queue.</p>
+</div>`;
 
   return `
 <div class="page-title">My Appointments</div>
@@ -1184,12 +1230,19 @@ function renderDoctorAppts() {
 }
 
 function renderResources() {
+  const cards = [
+    ['Telehealth best practices', 'Ensure good lighting, test your camera and microphone before each session, and find a quiet private space. Introduce yourself clearly and speak slowly for the translation system to be most effective.'],
+    ['Working with the translation system', 'Use the text chat sidebar for key medical terms. Speak or type one concept at a time for most accurate translation. Confirm understanding by asking the patient to repeat back in their own words.'],
+    ['When to refer', 'Vela is for non-emergency consultations only. If a patient describes symptoms suggesting a medical emergency (chest pain, difficulty breathing, stroke symptoms), advise them to call emergency services immediately.']
+  ];
   return `
 <div class="page-title">Resources</div>
-<div style="display:flex;flex-direction:column;gap:16px;max-width:680px">
-  <div class="card"><h3 style="margin-bottom:10px">Telehealth best practices</h3><p style="color:var(--txt2);font-size:14px;line-height:1.7">Ensure good lighting, test your camera and microphone before each session, and find a quiet private space. Introduce yourself clearly and speak slowly for the translation system to be most effective.</p></div>
-  <div class="card"><h3 style="margin-bottom:10px">Working with the translation system</h3><p style="color:var(--txt2);font-size:14px;line-height:1.7">Use the text chat sidebar for key medical terms. Speak or type one concept at a time for most accurate translation. Confirm understanding by asking the patient to repeat back in their own words.</p></div>
-  <div class="card"><h3 style="margin-bottom:10px">When to refer</h3><p style="color:var(--txt2);font-size:14px;line-height:1.7">Vela is for non-emergency consultations only. If a patient describes symptoms suggesting a medical emergency (chest pain, difficulty breathing, stroke symptoms), advise them to call emergency services immediately.</p></div>
+<div style="display:flex;flex-direction:column;gap:12px;max-width:680px">
+  ${cards.map(([title, body]) => `
+  <div class="card">
+    <div style="font-size:15px;font-weight:700;letter-spacing:-.01em;margin-bottom:10px">${title}</div>
+    <p style="color:var(--txt2);font-size:14px;line-height:1.75">${body}</p>
+  </div>`).join('')}
 </div>`;
 }
 
@@ -1324,17 +1377,17 @@ function renderSummary() {
   const meds = Array.isArray(s.medications) ? s.medications : [];
 
   return `
-<div style="min-height:100vh;background:var(--bg);padding:20px">
+<div style="min-height:100vh;background:var(--bg);padding:32px 20px">
 <div class="summary-page">
   <div class="summary-header">
-    <div style="display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;border-radius:50%;background:rgba(34,197,94,.1);margin-bottom:20px">
-      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round"><polyline points="20,6 9,17 4,12"/></svg>
+    <div style="display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;border-radius:16px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);margin-bottom:20px">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round"><polyline points="20,6 9,17 4,12"/></svg>
     </div>
     <h1>Your Visit Summary</h1>
-    <p>${fmtDate(a?.created_at)} · ${a?.doctor_name ? `Dr. ${a.doctor_name}` : 'Volunteer Doctor'} · ${langDisplay(a?.language||'en')}</p>
+    <p>${fmtDate(a?.created_at)} &nbsp;·&nbsp; ${a?.doctor_name ? `Dr. ${a.doctor_name}` : 'Volunteer Doctor'} &nbsp;·&nbsp; ${langDisplay(a?.language||'en')}</p>
   </div>
 
-  <div class="card" style="margin-bottom:16px">
+  <div class="card" style="margin-bottom:12px">
     <div class="summary-section">
       <h3>What we discussed</h3>
       <p>${s.what_we_discussed || 'Visit completed.'}</p>
@@ -1342,28 +1395,28 @@ function renderSummary() {
   </div>
 
   ${steps.length > 0 ? `
-  <div class="card" style="margin-bottom:16px">
+  <div class="card" style="margin-bottom:12px">
     <div class="summary-section">
       <h3>What to do next</h3>
       <div class="next-steps">
         ${steps.map((step, i) => `
         <div class="next-step">
           <div class="step-n">${i+1}</div>
-          <div style="font-size:14px;color:var(--txt);line-height:1.5">${step}</div>
+          <div style="font-size:14px;color:var(--txt);line-height:1.6">${step}</div>
         </div>`).join('')}
       </div>
     </div>
   </div>` : ''}
 
   ${meds.length > 0 ? `
-  <div class="card" style="margin-bottom:16px">
+  <div class="card" style="margin-bottom:12px">
     <div class="summary-section">
       <h3>Medications mentioned</h3>
-      <div class="meds">${meds.map(m=>`<span class="med-badge">💊 ${m}</span>`).join('')}</div>
+      <div class="meds">${meds.map(m=>`<span class="med-badge">${m}</span>`).join('')}</div>
     </div>
   </div>` : ''}
 
-  <div class="card" style="margin-bottom:16px">
+  <div class="card" style="margin-bottom:12px">
     <div class="summary-section">
       <h3>Follow-up</h3>
       <div class="followup-box">${s.follow_up || 'No specific follow-up recommended.'}</div>
@@ -1372,7 +1425,7 @@ function renderSummary() {
 
   <div class="summary-actions">
     <button class="btn btn-secondary" onclick="downloadSummary()">
-      ${ICO.dl} Download Summary
+      ${ICO.dl} Download PDF
     </button>
     <button class="btn btn-primary" onclick="navigate('dashboard',{subview:'new_appt',apptStep:1})">
       Book another appointment
