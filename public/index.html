@@ -311,6 +311,18 @@ hr{border:none;border-top:1px solid var(--brd);margin:24px 0}
 .waiting-room h2{font-size:21px;font-weight:800;letter-spacing:-.02em;margin-bottom:10px}
 .waiting-room p{color:var(--txt2);font-size:14px;margin-bottom:32px;line-height:1.7;max-width:400px}
 
+/* Emergency screen */
+.emergency-card{background:linear-gradient(135deg,rgba(239,68,68,.1),rgba(239,68,68,.04));border:1px solid rgba(239,68,68,.35);border-radius:18px;padding:32px;max-width:560px;box-shadow:0 0 50px rgba(239,68,68,.1)}
+.emergency-icon{width:60px;height:60px;border-radius:16px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);display:flex;align-items:center;justify-content:center;color:var(--err);margin-bottom:20px}
+.emergency-card h2{font-size:22px;font-weight:800;letter-spacing:-.02em;margin-bottom:10px;color:var(--txt)}
+.emergency-card p{color:var(--txt2);font-size:14.5px;line-height:1.7;margin-bottom:14px}
+.emergency-reason{background:var(--sunken);border:1px solid var(--brd);border-radius:10px;padding:12px 14px;font-size:13.5px;color:var(--txt);margin-bottom:22px}
+.emergency-call{display:flex;align-items:center;gap:14px;background:var(--err);color:#fff;border-radius:14px;padding:18px 22px;margin-bottom:18px;text-decoration:none;transition:all .18s}
+.emergency-call:hover{background:#dc2626;transform:translateY(-1px);box-shadow:0 8px 24px rgba(239,68,68,.35);color:#fff}
+.emergency-call-num{font-size:22px;font-weight:800;letter-spacing:-.01em}
+.emergency-call-sub{font-size:12.5px;opacity:.85}
+.emergency-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
+
 /* ═══════════ VIDEO ═══════════ */
 .video-room{display:flex;height:100vh;background:#030308;overflow:hidden}
 .video-col{flex:1;position:relative;min-width:0}
@@ -1007,9 +1019,9 @@ function renderNewAppt() {
   return `
 <div class="page-title">New Appointment</div>
 <div class="intake-box">
-  ${renderStepIndicator(S.apptStep)}
+  ${renderStepIndicator(S.apptStep === 'emergency' ? 2 : S.apptStep)}
   <div id="appt-step-content">
-    ${S.apptStep === 1 ? renderStep1() : S.apptStep === 2 ? renderStep2() : renderStep3()}
+    ${S.apptStep === 'emergency' ? renderEmergency() : S.apptStep === 1 ? renderStep1() : S.apptStep === 2 ? renderStep2() : renderStep3()}
   </div>
 </div>`;
 }
@@ -1253,10 +1265,13 @@ ${q.length === 0
       const s = a.intake_summary || {};
       const symptoms = Array.isArray(s.symptoms) ? s.symptoms.slice(0,3) : [];
       return `
-      <div class="queue-card">
+      <div class="queue-card"${s.emergency ? ' style="border-color:rgba(239,68,68,.4)"' : ''}>
         <div class="queue-header">
           <div class="queue-patient">${maskName(a.patient_name)}</div>
-          ${severityBadge(s.severity)}
+          <div style="display:flex;gap:6px;align-items:center">
+            ${s.emergency ? `<span class="badge badge-err">⚠ Possible emergency</span>` : ''}
+            ${severityBadge(s.severity)}
+          </div>
         </div>
         <div class="queue-meta">
           <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>${waitingTime(a.created_at)}</span>
@@ -1580,14 +1595,47 @@ async function handleIntakeContinue() {
     const d = await api('POST', '/api/appointments', { intake_raw: S.intakeRaw, language: S.selectedLang });
     S.currentAppt = d.appointment;
     S.intakeSummary = d.appointment.intake_summary;
-    S.apptStep = 2;
+    S.apptStep = (S.intakeSummary && S.intakeSummary.emergency) ? 'emergency' : 2;
   } catch(e) {
     showToast(e.message || 'Analysis failed', 'err');
     S.apptStep = 1;
   }
   S.loading = false;
   const el2 = document.getElementById('appt-step-content');
-  if (el2) { el2.innerHTML = S.apptStep === 2 ? renderStep2() : renderStep1(); attachHandlers(); }
+  if (el2) {
+    el2.innerHTML = S.apptStep === 'emergency' ? renderEmergency() : S.apptStep === 2 ? renderStep2() : renderStep1();
+    attachHandlers();
+  }
+}
+
+function renderEmergency() {
+  const s = S.intakeSummary || {};
+  return `
+<div class="emergency-card">
+  <div class="emergency-icon">
+    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+  </div>
+  <h2>This may be a medical emergency</h2>
+  <p>Based on what you described, you may need urgent medical care right away. Vela connects you with volunteer doctors for non-emergency visits — it is <strong>not</strong> a substitute for emergency services.</p>
+  ${s.emergency_reason ? `<div class="emergency-reason"><strong>Why:</strong> ${s.emergency_reason}</div>` : ''}
+  <a class="emergency-call" href="tel:911">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.06 8.81 19.79 19.79 0 01.06 1a2 2 0 012-2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.34 6.73a16 16 0 006.93 6.93l1.09-1.09a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 13.92z"/></svg>
+    <div>
+      <div class="emergency-call-num">Call 911 now</div>
+      <div class="emergency-call-sub">Or your local emergency number</div>
+    </div>
+  </a>
+  <div class="emergency-actions">
+    <button class="btn btn-secondary" onclick="renderStep1InPlace()">← Edit my description</button>
+    <button class="btn btn-ghost" onclick="proceedDespiteEmergency()">I'm safe — continue to a doctor</button>
+  </div>
+</div>`;
+}
+
+function proceedDespiteEmergency() {
+  S.apptStep = 2;
+  const el = document.getElementById('appt-step-content');
+  if (el) { el.innerHTML = renderStep2(); attachHandlers(); }
 }
 
 async function handleIntakeConfirm() {

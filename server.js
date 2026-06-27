@@ -191,15 +191,19 @@ Return ONLY a valid JSON object, no markdown, no explanation:
   "symptoms": ["symptom 1", "symptom 2"],
   "duration": "how long symptoms have been present",
   "severity": "low|medium|high",
-  "urgency_notes": "brief note for the doctor about urgency level"
+  "urgency_notes": "brief note for the doctor about urgency level",
+  "emergency": false,
+  "emergency_reason": ""
 }
+
+Set "emergency" to true ONLY if the description suggests a life-threatening medical emergency that needs immediate in-person or 911 care. Examples: chest pain or pressure, difficulty breathing or shortness of breath, signs of stroke (face drooping, slurred speech, sudden one-sided weakness/numbness), severe or uncontrolled bleeding, severe allergic reaction or anaphylaxis, loss of consciousness or fainting, seizure, severe head injury, coughing or vomiting blood, thoughts of suicide or self-harm, or symptoms of a heart attack. If emergency is true, set "emergency_reason" to a brief plain-language reason. Otherwise set emergency to false and emergency_reason to "".
 
 Patient description: "${intake_raw.replace(/"/g, "'")}"`;
 
+    const fallback = { chief_complaint: intake_raw.slice(0, 150), symptoms: [], duration: 'unknown', severity: 'medium', urgency_notes: '', emergency: false, emergency_reason: '' };
     const raw = await gemini(prompt).catch(() => null);
-    const intake_summary = raw
-      ? safeParseJson(raw, { chief_complaint: intake_raw.slice(0, 150), symptoms: [], duration: 'unknown', severity: 'medium', urgency_notes: '' })
-      : { chief_complaint: intake_raw.slice(0, 150), symptoms: [], duration: 'unknown', severity: 'medium', urgency_notes: '' };
+    const intake_summary = raw ? safeParseJson(raw, fallback) : fallback;
+    if (typeof intake_summary.emergency !== 'boolean') intake_summary.emergency = false;
 
     const appt = {
       id: crypto.randomUUID(),
