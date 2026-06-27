@@ -95,8 +95,8 @@ passport.deserializeUser(async (id, done) => {
 
 // ─── Middleware ───────────────────────────────────────────────────────────────
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '15mb' })); // allow base64 photo uploads
+app.use(express.urlencoded({ extended: true, limit: '15mb' }));
 app.use(session({
   secret: process.env.SESSION_SECRET || crypto.randomBytes(32).toString('hex'),
   resave: false,
@@ -154,8 +154,13 @@ app.get('/api/me', (req, res) => res.json({ user: req.user || null }));
 
 app.post('/api/appointments', requireRole('patient'), async (req, res) => {
   try {
-    const { intake_raw, language = 'en' } = req.body;
+    const { intake_raw, language = 'en', photos } = req.body;
     if (!intake_raw?.trim()) return res.status(400).json({ error: 'Description is required' });
+
+    // Validate uploaded photos: max 3 JPEG/PNG data URLs, ~3MB each
+    const safePhotos = Array.isArray(photos)
+      ? photos.filter(p => typeof p === 'string' && p.startsWith('data:image/') && p.length < 4_000_000).slice(0, 3)
+      : [];
 
     const prompt = `You are a medical intake assistant. Analyze the patient description and extract structured information.
 Return ONLY a valid JSON object, no markdown, no explanation:
@@ -190,6 +195,7 @@ Patient description: "${intake_raw.replace(/"/g, "'")}"`;
       language,
       intake_raw,
       intake_summary,
+      photos: safePhotos,
       room_name: null,
       room_url: null,
       doctor_token: null,

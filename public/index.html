@@ -301,6 +301,16 @@ hr{border:none;border-top:1px solid var(--brd);margin:24px 0}
 .symptoms-list{display:flex;flex-wrap:wrap;gap:6px}
 .symptom-tag{background:var(--acc-g);border:1px solid rgba(45,212,191,.2);color:var(--acc);padding:3px 10px;border-radius:6px;font-size:12px;font-weight:500}
 
+/* Photo upload */
+.photo-upload{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.photo-thumb{position:relative;width:74px;height:74px;border-radius:10px;overflow:hidden;border:1px solid var(--brd)}
+.photo-thumb img{width:100%;height:100%;object-fit:cover;cursor:zoom-in}
+.photo-thumb-remove{position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;background:rgba(0,0,0,.65);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;line-height:1;padding:0}
+.photo-add{width:74px;height:74px;border-radius:10px;border:1.5px dashed var(--brd2);background:var(--sunken);color:var(--txt2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;font-size:11px;font-weight:500;transition:all .18s}
+.photo-add:hover{border-color:var(--acc);color:var(--acc)}
+.photo-strip{display:flex;flex-wrap:wrap;gap:8px}
+.photo-strip img{width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid var(--brd);cursor:zoom-in}
+
 .waiting-room{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 24px;text-align:center;min-height:60vh}
 .pulse-wrap{position:relative;width:100px;height:100px;margin-bottom:36px}
 .pulse-ring{position:absolute;inset:-20px;border-radius:50%;border:1.5px solid rgba(45,212,191,.15);animation:ring-pulse 2.2s ease-out infinite}
@@ -474,7 +484,9 @@ const ICO = {
   flame:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 2C12 2 7 7 7 12C7 14.76 9.24 17 12 17C14.76 17 17 14.76 17 12C17 10 15 8 15 8C15 8 14 11 12 11C10 11 9 9 12 2Z" fill="#2dd4bf"/><path d="M10 17.5C10 18.88 10.9 20 12 20C13.1 20 14 18.88 14 17.5" stroke="#2dd4bf" stroke-width="1.5" stroke-linecap="round"/></svg>`,
   logout:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>`,
   sun:`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.07" y2="4.93"/></svg>`,
-  moon:`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>`
+  moon:`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>`,
+  camera:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>`,
+  bell:`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>`
 };
 
 // ═══════════════════════════════════════════════════════════════
@@ -490,6 +502,7 @@ let S = {
   appointments: [],
   queue: [],
   intakeRaw: '',
+  intakePhotos: [],
   intakeSummary: null,
   selectedLang: 'en',
   messages: [],
@@ -683,7 +696,7 @@ function navigate(view, opts = {}) {
 
 function subnav(sv) {
   S.subview = sv;
-  if (sv === 'new_appt') { S.apptStep = 1; S.intakeRaw = ''; S.intakeSummary = null; }
+  if (sv === 'new_appt') { S.apptStep = 1; S.intakeRaw = ''; S.intakePhotos = []; S.intakeSummary = null; }
   if (['home', 'appointments', 'health', 'queue'].includes(sv)) {
     loadSubviewData();
   } else {
@@ -1049,6 +1062,10 @@ function renderStep1() {
       <button class="voice-btn" id="voice-btn" onclick="handleVoice()" title="Voice input">${ICO.mic}</button>
     </div>
   </div>
+  <div class="form-group">
+    <label class="label">Add photos <span style="text-transform:none;font-weight:400;letter-spacing:0;color:var(--txt3)">— optional (rash, swelling, a medication label)</span></label>
+    <div class="photo-upload" id="photo-upload">${photoUploadInner()}</div>
+  </div>
   <div class="form-group lang-select-wrap">
     <label class="label">Your preferred language</label>
     <select class="input" onchange="S.selectedLang=this.value">
@@ -1090,10 +1107,14 @@ function renderStep2() {
       <div class="intake-field-value">${severityBadge(s.severity)}</div>
     </div>
   </div>
-  <div class="intake-field" style="border:none;padding:0;gap:10px;margin-bottom:20px">
+  <div class="intake-field" style="border:none;padding:0;gap:10px;margin-bottom:${S.intakePhotos.length?'16px':'20px'}">
     <div class="intake-field-label">Language</div>
     <div class="intake-field-value">${langDisplay(S.selectedLang)}</div>
   </div>
+  ${S.intakePhotos.length ? `<div class="intake-field" style="border:none;padding:0;gap:10px;margin-bottom:20px">
+    <div class="intake-field-label">Photos</div>
+    <div class="photo-strip">${S.intakePhotos.map(p=>`<img src="${p}" onclick="openPhoto(this.src)">`).join('')}</div>
+  </div>` : ''}
   <div style="display:flex;gap:12px">
     <button class="btn btn-secondary" onclick="S.apptStep=1;renderStep1InPlace()">← Edit</button>
     <button class="btn btn-primary" onclick="handleIntakeConfirm()" ${S.loading?'disabled':''}>
@@ -1286,9 +1307,12 @@ ${q.length === 0
           <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--txt2);margin-bottom:8px">Doctor notes</div>
           <div style="font-size:13px;color:var(--txt2)">${s.urgency_notes || 'No additional notes'}</div>
           <div style="margin-top:8px"><strong>Duration:</strong> ${s.duration || 'Unknown'}</div>
+          ${Array.isArray(a.photos) && a.photos.length ? `
+          <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--txt2);margin:14px 0 8px">Patient photos</div>
+          <div class="photo-strip">${a.photos.map(p=>`<img src="${p}" onclick="openPhoto(this.src)">`).join('')}</div>` : ''}
         </div>
         <div class="queue-actions">
-          <button class="btn btn-secondary btn-sm" onclick="toggleQueueDetail('${a.id}')">View Full Summary</button>
+          <button class="btn btn-secondary btn-sm" onclick="toggleQueueDetail('${a.id}')">View Full Summary${Array.isArray(a.photos)&&a.photos.length?` · ${a.photos.length} 📷`:''}</button>
           <button class="btn btn-primary btn-sm" onclick="acceptPatient('${a.id}')">Accept &amp; Join Call</button>
         </div>
       </div>`;
@@ -1583,6 +1607,76 @@ async function handleLogout() {
   navigate('landing');
 }
 
+// ─── Photo upload ─────────────────────────────────────────────
+
+function photoUploadInner() {
+  const thumbs = S.intakePhotos.map((p, i) =>
+    `<div class="photo-thumb"><img src="${p}" onclick="openPhoto(this.src)"><button class="photo-thumb-remove" onclick="removePhoto(${i})" title="Remove">×</button></div>`
+  ).join('');
+  const add = S.intakePhotos.length < 3
+    ? `<label class="photo-add">${ICO.camera}<span>Add</span><input type="file" accept="image/*" multiple style="display:none" onchange="handlePhotoSelect(this)"></label>`
+    : '';
+  return thumbs + add;
+}
+
+function refreshPhotoUpload() {
+  const el = document.getElementById('photo-upload');
+  if (el) el.innerHTML = photoUploadInner();
+}
+
+async function handlePhotoSelect(input) {
+  const files = Array.from(input.files || []);
+  for (const f of files) {
+    if (S.intakePhotos.length >= 3) { showToast('You can add up to 3 photos', 'err'); break; }
+    if (!f.type.startsWith('image/')) continue;
+    try { S.intakePhotos.push(await compressImage(f)); }
+    catch(e) { showToast('Could not read that image', 'err'); }
+  }
+  input.value = '';
+  refreshPhotoUpload();
+}
+
+function removePhoto(i) {
+  S.intakePhotos.splice(i, 1);
+  refreshPhotoUpload();
+}
+
+function compressImage(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const max = 1024;
+        let { width, height } = img;
+        if (width > max || height > max) {
+          const r = Math.min(max / width, max / height);
+          width = Math.round(width * r); height = Math.round(height * r);
+        }
+        const c = document.createElement('canvas');
+        c.width = width; c.height = height;
+        c.getContext('2d').drawImage(img, 0, 0, width, height);
+        resolve(c.toDataURL('image/jpeg', 0.7));
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+function openPhoto(src) {
+  const o = document.createElement('div');
+  o.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;z-index:9999;padding:24px;cursor:zoom-out';
+  o.onclick = () => o.remove();
+  const img = document.createElement('img');
+  img.src = src;
+  img.style.cssText = 'max-width:100%;max-height:100%;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.5)';
+  o.appendChild(img);
+  document.body.appendChild(o);
+}
+
 async function handleIntakeContinue() {
   const ta = document.getElementById('intake-textarea');
   const text = ta ? ta.value.trim() : S.intakeRaw.trim();
@@ -1592,7 +1686,7 @@ async function handleIntakeContinue() {
   const el = document.getElementById('appt-step-content');
   if (el) el.innerHTML = `<div class="card" style="text-align:center;padding:48px"><div class="spinner" style="margin:0 auto 16px"></div><p style="color:var(--txt2)">Analyzing your symptoms…</p></div>`;
   try {
-    const d = await api('POST', '/api/appointments', { intake_raw: S.intakeRaw, language: S.selectedLang });
+    const d = await api('POST', '/api/appointments', { intake_raw: S.intakeRaw, language: S.selectedLang, photos: S.intakePhotos });
     S.currentAppt = d.appointment;
     S.intakeSummary = d.appointment.intake_summary;
     S.apptStep = (S.intakeSummary && S.intakeSummary.emergency) ? 'emergency' : 2;
