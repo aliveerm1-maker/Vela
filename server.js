@@ -11,6 +11,7 @@ const db = require('./db');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const SUPPORTED_LANGUAGES = new Set(['en','es','fr','pt','ar','hi','bn','zh','ru','ja','ko','de','it','tr','vi','th','id','sw','tl','ur','fa','pl','uk','am','so','ha','yo']);
 
 // ─── Gemini ───────────────────────────────────────────────────────────────────
 
@@ -150,12 +151,23 @@ app.post('/auth/logout', (req, res) => req.logout(() => res.json({ ok: true })))
 
 app.get('/api/me', (req, res) => res.json({ user: req.user || null }));
 
+app.patch('/api/me/language', requireAuth, async (req, res) => {
+  const language = String(req.body.language || '').toLowerCase();
+  if (!SUPPORTED_LANGUAGES.has(language)) return res.status(400).json({ error: 'Unsupported language' });
+  await db.updateUser(req.user.id, { language });
+  req.user.language = language;
+  res.json({ language });
+});
+
 // ─── Patient Routes ───────────────────────────────────────────────────────────
 
 app.post('/api/appointments', requireRole('patient'), async (req, res) => {
   try {
-    const { intake_raw, language = 'en', photos } = req.body;
+    const { intake_raw, language: requestedLanguage = 'en', photos } = req.body;
     if (!intake_raw?.trim()) return res.status(400).json({ error: 'Description is required' });
+    const language = SUPPORTED_LANGUAGES.has(String(requestedLanguage).toLowerCase())
+      ? String(requestedLanguage).toLowerCase()
+      : 'en';
 
     // Validate uploaded photos: max 3 JPEG/PNG data URLs, ~3MB each
     const safePhotos = Array.isArray(photos)
