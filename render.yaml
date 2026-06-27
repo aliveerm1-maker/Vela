@@ -2,11 +2,13 @@ services:
   - type: web
     name: vela
     env: node
-    buildCommand: npm install
+    buildCommand: npm ci --omit=dev
     startCommand: node server.js
     envVars:
       - key: NODE_ENV
         value: production
+      - key: NODE_VERSION
+        value: "20.19.0"
       - key: GEMINI_API_KEY
         sync: false
       - key: GOOGLE_CLIENT_ID
