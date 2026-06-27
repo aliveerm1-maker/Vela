@@ -5,33 +5,12 @@ const passport = require('passport');
 const { Strategy: GoogleStrategy } = require('passport-google-oauth20');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const fetch = require('node-fetch');
-const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const db = require('./db');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-
-// ─── Data Layer ───────────────────────────────────────────────────────────────
-
-const DATA_DIR = path.join(__dirname, 'data');
-const USERS_FILE = path.join(DATA_DIR, 'users.json');
-const APPTS_FILE = path.join(DATA_DIR, 'appointments.json');
-
-if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-
-const readJson = (file, fallback) => {
-  try {
-    if (!fs.existsSync(file)) return fallback;
-    return JSON.parse(fs.readFileSync(file, 'utf8'));
-  } catch { return fallback; }
-};
-const writeJson = (file, data) => fs.writeFileSync(file, JSON.stringify(data, null, 2));
-
-const getUsers = () => readJson(USERS_FILE, {});
-const saveUsers = (u) => writeJson(USERS_FILE, u);
-const getAppts = () => readJson(APPTS_FILE, []);
-const saveAppts = (a) => writeJson(APPTS_FILE, a);
 
 // ─── Gemini ───────────────────────────────────────────────────────────────────
 
@@ -92,10 +71,9 @@ passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID || '',
   clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
   callbackURL: process.env.GOOGLE_CALLBACK_URL || `http://localhost:${PORT}/auth/google/callback`
-}, (_at, _rt, profile, done) => {
-  const users = getUsers();
-  if (!users[profile.id]) {
-    users[profile.id] = {
+}, async (_at, _rt, profile, done) => {
+  try {
+    const user = await db.createUserIfAbsent({
       id: profile.id,
       email: profile.emails?.[0]?.value || '',
       name: profile.displayName || '',
@@ -104,16 +82,15 @@ passport.use(new GoogleStrategy({
       available: false,
       language: 'en',
       created_at: new Date().toISOString()
-    };
-    saveUsers(users);
-  }
-  done(null, users[profile.id]);
+    });
+    done(null, user);
+  } catch (e) { done(e); }
 }));
 
 passport.serializeUser((u, done) => done(null, u.id));
-passport.deserializeUser((id, done) => {
-  const users = getUsers();
-  done(null, users[id] || false);
+passport.deserializeUser(async (id, done) => {
+  try { done(null, (await db.getUser(id)) || false); }
+  catch (e) { done(e); }
 });
 
 // ─── Middleware ───────────────────────────────────────────────────────────────
@@ -148,26 +125,22 @@ app.get('/auth/google', (req, res, next) => {
 
 app.get('/auth/google/callback',
   passport.authenticate('google', { failureRedirect: '/?error=auth' }),
-  (req, res) => {
+  async (req, res) => {
     const intent = req.session.intent;
     delete req.session.intent;
     if (!req.user.role && intent && ['patient', 'doctor'].includes(intent)) {
-      const users = getUsers();
-      users[req.user.id].role = intent;
+      await db.updateUser(req.user.id, { role: intent });
       req.user.role = intent;
-      saveUsers(users);
     }
     res.redirect('/');
   }
 );
 
-app.post('/auth/role', requireAuth, (req, res) => {
+app.post('/auth/role', requireAuth, async (req, res) => {
   const { role } = req.body;
   if (!['patient', 'doctor'].includes(role)) return res.status(400).json({ error: 'Invalid role' });
-  const users = getUsers();
-  users[req.user.id].role = role;
+  await db.updateUser(req.user.id, { role });
   req.user.role = role;
-  saveUsers(users);
   res.json({ ok: true, role });
 });
 
@@ -229,9 +202,7 @@ Patient description: "${intake_raw.replace(/"/g, "'")}"`;
       completed_at: null
     };
 
-    const appts = getAppts();
-    appts.push(appt);
-    saveAppts(appts);
+    await db.createAppt(appt);
     res.json({ appointment: appt });
   } catch (e) {
     console.error('Create appointment error:', e);
@@ -239,24 +210,21 @@ Patient description: "${intake_raw.replace(/"/g, "'")}"`;
   }
 });
 
-app.get('/api/appointments', requireAuth, (req, res) => {
-  const appts = getAppts();
-  const mine = req.user.role === 'patient'
-    ? appts.filter(a => a.patient_id === req.user.id)
-    : appts.filter(a => a.doctor_id === req.user.id);
-  res.json({ appointments: mine.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)) });
+app.get('/api/appointments', requireAuth, async (req, res) => {
+  const mine = await db.getApptsForUser(req.user.id, req.user.role);
+  res.json({ appointments: mine });
 });
 
-app.get('/api/appointments/:id', requireAuth, (req, res) => {
-  const appt = getAppts().find(a => a.id === req.params.id);
+app.get('/api/appointments/:id', requireAuth, async (req, res) => {
+  const appt = await db.getApptById(req.params.id);
   if (!appt) return res.status(404).json({ error: 'Not found' });
   if (appt.patient_id !== req.user.id && appt.doctor_id !== req.user.id)
     return res.status(403).json({ error: 'Forbidden' });
   res.json({ appointment: appt });
 });
 
-app.get('/api/appointments/:id/poll', requireAuth, (req, res) => {
-  const appt = getAppts().find(a => a.id === req.params.id);
+app.get('/api/appointments/:id/poll', requireAuth, async (req, res) => {
+  const appt = await db.getApptById(req.params.id);
   if (!appt) return res.status(404).json({ error: 'Not found' });
   if (appt.patient_id !== req.user.id && appt.doctor_id !== req.user.id)
     return res.status(403).json({ error: 'Forbidden' });
@@ -264,53 +232,54 @@ app.get('/api/appointments/:id/poll', requireAuth, (req, res) => {
   res.json({ status: appt.status, room_url: appt.room_url, token });
 });
 
-app.patch('/api/appointments/:id/cancel', requireRole('patient'), (req, res) => {
-  const appts = getAppts();
-  const i = appts.findIndex(a => a.id === req.params.id && a.patient_id === req.user.id);
-  if (i === -1) return res.status(404).json({ error: 'Not found' });
-  if (!['pending', 'active'].includes(appts[i].status))
+app.patch('/api/appointments/:id/cancel', requireRole('patient'), async (req, res) => {
+  const appt = await db.getApptById(req.params.id);
+  if (!appt || appt.patient_id !== req.user.id) return res.status(404).json({ error: 'Not found' });
+  if (!['pending', 'active'].includes(appt.status))
     return res.status(400).json({ error: 'Cannot cancel this appointment' });
-  appts[i].status = 'cancelled';
-  saveAppts(appts);
+  await db.updateAppt(req.params.id, { status: 'cancelled' });
   res.json({ ok: true });
 });
 
-app.get('/api/appointments/:id/messages', requireAuth, (req, res) => {
-  const appt = getAppts().find(a => a.id === req.params.id);
+app.get('/api/appointments/:id/messages', requireAuth, async (req, res) => {
+  const appt = await db.getApptById(req.params.id);
   if (!appt) return res.status(404).json({ error: 'Not found' });
   if (appt.patient_id !== req.user.id && appt.doctor_id !== req.user.id)
     return res.status(403).json({ error: 'Forbidden' });
   const since = parseInt(req.query.since || '0', 10);
-  res.json({ messages: appt.messages.slice(since), total: appt.messages.length });
+  const messages = appt.messages || [];
+  res.json({ messages: messages.slice(since), total: messages.length });
 });
 
 // ─── Doctor Routes ────────────────────────────────────────────────────────────
 
-app.get('/api/queue', requireRole('doctor'), (req, res) => {
-  const queue = getAppts()
-    .filter(a => a.status === 'pending')
-    .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+app.get('/api/queue', requireRole('doctor'), async (req, res) => {
+  const queue = await db.getQueue();
   res.json({ queue });
 });
 
-app.patch('/api/me/availability', requireRole('doctor'), (req, res) => {
+app.patch('/api/me/availability', requireRole('doctor'), async (req, res) => {
   const { available } = req.body;
-  const users = getUsers();
-  users[req.user.id].available = !!available;
+  await db.updateUser(req.user.id, { available: !!available });
   req.user.available = !!available;
-  saveUsers(users);
   res.json({ available: !!available });
 });
 
 app.post('/api/appointments/:id/accept', requireRole('doctor'), async (req, res) => {
-  const appts = getAppts();
-  const i = appts.findIndex(a => a.id === req.params.id && a.status === 'pending');
-  if (i === -1) return res.status(404).json({ error: 'Appointment not found or already taken' });
+  const room_name = `vela-${req.params.id.slice(0, 8)}`;
 
-  const appt = appts[i];
-  const room_name = `vela-${appt.id.slice(0, 8)}`;
+  // Atomically claim the pending appointment so two doctors can't grab the same one
+  const claimed = await db.claimAppt(req.params.id, {
+    doctor_id: req.user.id,
+    doctor_name: req.user.name,
+    doctor_picture: req.user.picture || null,
+    room_name,
+    started_at: new Date().toISOString()
+  });
+  if (!claimed) return res.status(404).json({ error: 'Appointment not found or already taken' });
+
+  // Create the video room/tokens, then attach them
   let room_url = null, doctor_token = null, patient_token = null;
-
   try {
     const room = await createRoom(room_name);
     room_url = room.url;
@@ -324,31 +293,15 @@ app.post('/api/appointments/:id/accept', requireRole('doctor'), async (req, res)
     console.error('Daily.co error:', e.message);
   }
 
-  appts[i] = {
-    ...appt,
-    doctor_id: req.user.id,
-    doctor_name: req.user.name,
-    doctor_picture: req.user.picture || null,
-    status: 'active',
-    room_name,
-    room_url,
-    doctor_token,
-    patient_token,
-    started_at: new Date().toISOString()
-  };
-
-  saveAppts(appts);
-  res.json({ appointment: appts[i] });
+  const appt = await db.updateAppt(req.params.id, { room_url, doctor_token, patient_token });
+  res.json({ appointment: appt });
 });
 
 app.post('/api/appointments/:id/complete', requireRole('doctor'), async (req, res) => {
   try {
     const { doctor_notes = '' } = req.body;
-    const appts = getAppts();
-    const i = appts.findIndex(a => a.id === req.params.id && a.doctor_id === req.user.id);
-    if (i === -1) return res.status(404).json({ error: 'Not found' });
-
-    const appt = appts[i];
+    const appt = await db.getApptById(req.params.id);
+    if (!appt || appt.doctor_id !== req.user.id) return res.status(404).json({ error: 'Not found' });
 
     const prompt = `You are a medical assistant helping patients understand their visit.
 Write a clear, plain-language visit summary based on the following.
@@ -384,9 +337,10 @@ ${appt.language !== 'en' ? `Write entirely in the ${appt.language} language.` : 
           follow_up: 'None recommended'
         };
 
-    appts[i] = { ...appt, status: 'completed', doctor_notes, post_call_summary, completed_at: new Date().toISOString() };
-    saveAppts(appts);
-    res.json({ appointment: appts[i] });
+    const updated = await db.updateAppt(req.params.id, {
+      status: 'completed', doctor_notes, post_call_summary, completed_at: new Date().toISOString()
+    });
+    res.json({ appointment: updated });
   } catch (e) {
     console.error('Complete appointment error:', e);
     res.status(500).json({ error: 'Failed to complete appointment' });
@@ -405,21 +359,15 @@ app.post('/api/translate', requireAuth, async (req, res) => {
     );
 
     if (appointment_id) {
-      const appts = getAppts();
-      const i = appts.findIndex(a => a.id === appointment_id);
-      if (i !== -1) {
-        const sender = req.user.role;
-        appts[i].messages.push({
-          id: crypto.randomUUID(),
-          sender,
-          original_text: text,
-          original_language: source_language,
-          translated_text: translated.trim(),
-          translated_language: target_language,
-          timestamp: new Date().toISOString()
-        });
-        saveAppts(appts);
-      }
+      await db.pushMessage(appointment_id, {
+        id: crypto.randomUUID(),
+        sender: req.user.role,
+        original_text: text,
+        original_language: source_language,
+        translated_text: translated.trim(),
+        translated_language: target_language,
+        timestamp: new Date().toISOString()
+      });
     }
 
     res.json({ translated: translated.trim() });
@@ -435,4 +383,6 @@ app.get('*', (_req, res) => res.sendFile(path.join(__dirname, 'public', 'index.h
 
 // ─── Start ────────────────────────────────────────────────────────────────────
 
-app.listen(PORT, () => console.log(`Vela running on http://localhost:${PORT}`));
+db.connect()
+  .then(() => app.listen(PORT, () => console.log(`Vela running on http://localhost:${PORT}`)))
+  .catch((e) => { console.error('Failed to start — database connection error:', e.message); process.exit(1); });
